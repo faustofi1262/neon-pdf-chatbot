@@ -1,8 +1,9 @@
 Flask
 gunicorn
+psycopg2-binary
 openai
 pinecone-client
-psycopg2-binary
 bcrypt
-pdfplumber
 python-dotenv
+pdfplumber
+requests
