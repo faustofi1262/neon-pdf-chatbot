@@ -1,0 +1,8 @@
+Flask
+gunicorn
+openai
+pinecone-client
+psycopg2-binary
+bcrypt
+pdfplumber
+python-dotenv
