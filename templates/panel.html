@@ -5,26 +5,61 @@
   <title>Panel de administración</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/style.css">
   <style>
+    :root {
+      --color-principal: #1a5276;
+      --color-secundario: #d6eaf8;
+      --color-fondo: #f4f6f7;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f7;
       margin: 0;
-      padding: 0;
+      background-color: var(--color-fondo);
+    }
+
+    .layout {
+      display: flex;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: var(--color-principal);
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      font-family: 'Segoe UI';
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .sidebar nav a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    .sidebar nav a:hover {
+      text-decoration: underline;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 20px 40px;
     }
 
     header {
-      background-color: #1a5276;
+      background-color: var(--color-principal);
       color: white;
       padding: 15px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 22px;
     }
 
     .logout-btn {
@@ -38,59 +73,12 @@
       transition: background-color 0.3s ease;
     }
 
-    .logout-btn:hover {
-      background-color: #c0392b;
-    }
-
-    main {
-      padding: 40px;
-      text-align: center;
-    }
-
     .card {
       background-color: white;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-    }
-
-    .card h2 {
-      color: #1a5276;
-    }
-
-    .icono-accion {
-      margin-right: 10px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .icono-accion.ver {
-      color: #2980b9;
-    }
-
-    .icono-accion.eliminar {
-      color: #e74c3c;
-    }
-
-    td.nombre-pdf-sin-entrenar {
-      color: red;
-      font-weight: bold;
-    }
-
-    td.nombre-pdf-entrenado {
-      color: green;
-      font-weight: bold;
-    }
-
-    .acciones-links a {
-      margin-right: 10px;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    .acciones-links a:hover {
-      text-decoration: underline;
+      margin-bottom: 30px;
     }
   </style>
 </head>
@@ -101,85 +89,80 @@
       <button class="logout-btn">Cerrar sesión</button>
     </form>
   </header>
+  <div class="layout">
+    <!-- Menú lateral -->
+    <aside class="sidebar">
+      <h2>UTMACH</h2>
+      <nav>
+        <a href="/panel"><i class="fa fa-home"></i> Inicio</a>
+        <a href="#"><i class="fa fa-upload"></i> Subir PDF</a>
+        <a href="#"><i class="fa fa-eye"></i> Visualizar</a>
+        <a href="#"><i class="fa fa-database"></i> Estado</a>
+      </nav>
+    </aside>
 
-  <main>
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <div style="color: green; font-weight: bold; text-align: center; margin-bottom: 20px;">
-        {% for message in messages %}
-          <p>{{ message }}</p>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
-  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px;">
-
-    <!-- 🔳 COLUMNA IZQUIERDA -->
-    <div style="flex: 1; min-width: 300px; max-width: 450px;">
-      <!-- 📄 Subir PDF -->
-      <div class="card">
-        <h2>📄 Subir PDF</h2>
-        <form method="POST" enctype="multipart/form-data" action="/subir_pdf">
-          <input type="file" name="archivo_pdf" accept="application/pdf" required style="margin-bottom: 15px;">
-          <br>
-          <button type="submit">Subir PDF</button>
-        </form>
-      </div>
-
-      <!-- 📁 Archivos Subidos -->
-      <div class="card" style="margin-top: 30px;">
-        <h2>📁 Archivos subidos</h2>
-        {% if lista_pdfs %}
-          <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-            <thead>
-              <tr style="background-color: #d6eaf8;">
-                <th style="padding: 8px; border: 1px solid #ccc;">Archivo</th>
-                <th style="padding: 8px; border: 1px solid #ccc;">Fecha</th>
-                <th style="padding: 8px; border: 1px solid #ccc;">Estado</th>
-                <th style="padding: 8px; border: 1px solid #ccc;">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for pdf in lista_pdfs %}
-                <tr>
-                  <td class="{{ 'nombre-pdf-entrenado' if pdf[3] else 'nombre-pdf-sin-entrenar' }}" style="padding: 8px; border: 1px solid #ccc; word-break: break-word; max-width: 180px;">
-                    {{ pdf[1] }}
-                  </td>
-                  <td style="padding: 8px; border: 1px solid #ccc;">{{ pdf[2].strftime('%Y-%m-%d %H:%M') }}</td>
-                  <td style="padding: 8px; border: 1px solid #ccc;">
-                    {% if pdf[3] %}✅ Entrenado{% else %}⏳ Sin entrenar{% endif %}
-                  </td>
-                  <td style="padding: 8px; border: 1px solid #ccc;">
-                    <div class="acciones-links">
-                      <a href="{{ url_for('ver_pdf', nombre_archivo=pdf[1]) }}">👁 Ver</a>
-                      <a href="{{ url_for('eliminar_pdf', nombre_archivo=pdf[1]) }}" onclick="return confirm('¿Estás seguro de eliminar este archivo?');" style="color: red;">🗑 Eliminar</a>
-                    </div>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% else %}
-          <p>No se han subido archivos todavía.</p>
+    <!-- Contenido principal -->
+    <main class="main-content">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div style="color: green; font-weight: bold; margin-bottom: 20px;">
+            {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+          </div>
         {% endif %}
-      </div>
-    </div>
+      {% endwith %}
 
-    <!-- 🟥 COLUMNA DERECHA: visor -->
-    <div class="card" style="flex: 2; min-width: 400px;">
-  <h2>👁️ Visualizador de PDF</h2>
-  {% if ultimo_pdf %}
-    <iframe 
-      id="visor-pdf"
-      src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" 
-      width="100%" height="500px" style="border: 1px solid #ccc;">
-    </iframe>
-  {% else %}
-      <p>No se ha seleccionado ningún archivo todavía.</p>
-  {% endif %}
-    </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <div style="flex: 1; min-width: 320px;">
+          <!-- Subir PDF -->
+          <div class="card">
+            <h2>📄 Subir PDF</h2>
+            <form method="POST" enctype="multipart/form-data" action="/subir_pdf">
+              <input type="file" name="archivo_pdf" accept="application/pdf" required><br><br>
+              <button type="submit">Subir PDF</button>
+            </form>
+          </div>
+
+          <!-- Archivos Subidos -->
+          <div class="card">
+            <h2>📁 Archivos Subidos</h2>
+            {% if lista_pdfs %}
+              <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr style="background-color: var(--color-secundario);">
+                    <th>Archivo</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for pdf in lista_pdfs %}
+                    <tr>
+                      <td class="{{ 'nombre-pdf-entrenado' if pdf[3] else 'nombre-pdf-sin-entrenar' }}">{{ pdf[1] }}</td>
+                      <td>{{ pdf[2].strftime('%Y-%m-%d %H:%M') }}</td>
+                      <td>{% if pdf[3] %}✅ Entrenado{% else %}⏳ Sin entrenar{% endif %}</td>
+                      <td>
+                        <a class="icono-accion ver" href="{{ url_for('ver_pdf', nombre_archivo=pdf[1]) }}">👁 Ver</a>
+                        <a class="icono-accion eliminar" href="{{ url_for('eliminar_pdf', nombre_archivo=pdf[1]) }}" onclick="return confirm('¿Estás seguro de eliminar este archivo?');">🗑 Eliminar</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p>No se han subido archivos todavía.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Visualizador PDF -->
+        <div class="card" style="flex: 2; min-width: 400px;">
+          <h2>👁️ Visualizador de PDF</h2>
+          {% if ultimo_pdf %}
+            <iframe src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" width="100%" height="500px"></iframe>
+          {% else %}
+            <p>No se ha seleccionado ningún archivo todavía.</p>
+          {% endif %}
+        </div>
+      </div>
+    </main>
   </div>
-</main>
 </body>
-</html>
+</html
