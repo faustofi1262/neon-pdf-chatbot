@@ -104,12 +104,12 @@
       <section id="usuarios" class="seccion-panel" style="display: none;">
         <div class="card">
           <h2>👥 Gestión de Usuarios</h2>
-          <form method="POST" action="/crear_usuario">
+         <form action="{{ url_for('crear_usuario') }}" method="POST">
             <label for="username">Nombre:</label><br>
-            <input type="text" id="username" name="username" required><br><br>
+            <input type="text" name="nombre_usuario" required>
 
             <label for="password">Contraseña:</label><br>
-            <input type="password" id="password" name="password" required><br><br>
+            <input type="password" name="contrasena_hash" required>
 
             <label for="rol">Rol:</label><br>
             <select id="rol" name="rol">

@@ -169,7 +169,6 @@ def crear_usuario():
         contrasena = request.form.get('contrasena')
         rol = request.form.get('rol')
 
-        # Asegúrate de que los tres valores existen
         if not nombre_usuario or not contrasena or not rol:
             return "Faltan datos en el formulario", 400
 
@@ -179,7 +178,7 @@ def crear_usuario():
         cur = conn.cursor()
 
         cur.execute("""
-            INSERT INTO usuarios (nombre_usuario, contrasena, rol)
+            INSERT INTO usuarios (nombre_usuario, contrasena_hash, rol)
             VALUES (%s, %s, %s)
         """, (nombre_usuario, hashed_password, rol))
 
@@ -191,7 +190,7 @@ def crear_usuario():
         return redirect(url_for('usuarios'))
 
     except Exception as e:
-        print("Error al crear usuario:", e)  # 🔍 Esto se verá en los logs de Render
+        print("Error al crear usuario:", e)
         return "Error interno al crear el usuario", 500
 
 

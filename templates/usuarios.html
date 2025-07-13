@@ -39,23 +39,23 @@
       {% endwith %}
 
       <section class="card">
-        <h2>Registrar Nuevo Usuario</h2>
-        <form method="POST" action="/crear_usuario">
-          <label for="nombre">Nombre de usuario:</label><br>
-          <input type="text" name="nombre_usuario" required><br><br>
+  <h2>Registrar Nuevo Usuario</h2>
+  <form method="POST" action="/crear_usuario">
+    <label for="nombre_usuario">Nombre de usuario:</label><br>
+    <input type="text" name="nombre_usuario" required><br><br>
 
-          <label for="clave">Contraseña:</label><br>
-          <input type="password" name="clave" required><br><br>
+    <label for="contrasena">Contraseña:</label><br>
+    <input type="password" name="contrasena" required><br><br>
 
-          <label for="rol">Rol:</label><br>
-          <select name="rol">
-            <option value="admin">Administrador</option>
-            <option value="usuario">Usuario</option>
-          </select><br><br>
+    <label for="rol">Rol:</label><br>
+    <select name="rol">
+      <option value="admin">Administrador</option>
+      <option value="usuario">Usuario</option>
+    </select><br><br>
 
-          <button type="submit">Crear Usuario</button>
-        </form>
-      </section>
+    <button type="submit">Crear Usuario</button>
+  </form>
+</section>
     </main>
   </div>
 </body>
