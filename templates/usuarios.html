@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Crear Usuario</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Menú lateral -->
+    <aside class="sidebar">
+      <h2>UTMACH</h2>
+      <ul>
+        <li><i class="fa fa-home"></i> <a href="/panel">Inicio</a></li>
+        <li><i class="fa fa-upload"></i> <a href="/panel#subir">Subir PDF</a></li>
+        <li><i class="fa fa-users"></i> <a href="/usuarios">Usuarios</a></li>
+      </ul>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <header class="header">
+        <h1>Gestor de Usuarios</h1>
+        <form method="GET" action="{{ url_for('logout') }}">
+          <button class="logout-btn">Cerrar sesión</button>
+        </form>
+      </header>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-message">
+            {% for message in messages %}
+              <p>{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <section class="card">
+        <h2>Registrar Nuevo Usuario</h2>
+        <form method="POST" action="/crear_usuario">
+          <label for="nombre">Nombre de usuario:</label><br>
+          <input type="text" name="nombre" required><br><br>
+
+          <label for="clave">Contraseña:</label><br>
+          <input type="password" name="clave" required><br><br>
+
+          <label for="rol">Rol:</label><br>
+          <select name="rol">
+            <option value="admin">Administrador</option>
+            <option value="usuario">Usuario</option>
+          </select><br><br>
+
+          <button type="submit">Crear Usuario</button>
+        </form>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

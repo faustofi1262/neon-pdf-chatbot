@@ -159,21 +159,20 @@ def eliminar_pdf():
         flash(f"⚠️ Error al eliminar el archivo: {e}")
 
     return redirect(url_for('panel'))
+@app.route('/usuarios', methods=['GET'])
+def usuarios():
+    return render_template('usuarios.html')
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
     nombre = request.form['nombre']
-    correo = request.form['correo']
+    clave = request.form['clave']
     rol = request.form['rol']
-    clave = request.form['clave']  # Se puede cifrar si se desea seguridad la tabla recibe hash
-
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO usuarios (nombre, correo, rol, clave) VALUES (%s, %s, %s, %s)",
-                (nombre, correo, rol, clave))
+    cur.execute("INSERT INTO usuarios (nombre, clave, rol) VALUES (%s, %s, %s)", (nombre, clave, rol))
     conn.commit()
     cur.close()
     conn.close()
-
-    flash("✅ Usuario creado correctamente")
-    return redirect(url_for('panel'))
+    flash("Usuario creado exitosamente")
+    return redirect(url_for('usuarios'))
 
