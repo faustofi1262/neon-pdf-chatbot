@@ -164,15 +164,34 @@ def usuarios():
     return render_template('usuarios.html')
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
-    nombre_usuario = request.form.get['nombre_usuario']
-    clave = request.form['clave']
-    rol = request.form['rol']
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO usuarios (nombre, clave, rol) VALUES (%s, %s, %s)", (nombre_usuario, clave, rol))
-    conn.commit()
-    cur.close()
-    conn.close()
-    flash("Usuario creado exitosamente")
-    return redirect(url_for('usuarios'))
+    try:
+        nombre_usuario = request.form.get('nombre_usuario')
+        contrasena = request.form.get('contrasena')
+        rol = request.form.get('rol')
+
+        # Asegúrate de que los tres valores existen
+        if not nombre_usuario or not contrasena or not rol:
+            return "Faltan datos en el formulario", 400
+
+        hashed_password = generate_password_hash(contrasena)
+
+        conn = get_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+            INSERT INTO usuarios (nombre_usuario, contrasena, rol)
+            VALUES (%s, %s, %s)
+        """, (nombre_usuario, hashed_password, rol))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        flash("Usuario creado correctamente.")
+        return redirect(url_for('usuarios'))
+
+    except Exception as e:
+        print("Error al crear usuario:", e)  # 🔍 Esto se verá en los logs de Render
+        return "Error interno al crear el usuario", 500
+
 
