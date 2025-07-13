@@ -136,3 +136,25 @@ def ver_pdf(nombre_archivo):
                            nombre=session["nombre_usuario"],
                            ultimo_pdf=nombre_archivo,
                            lista_pdfs=lista_pdfs)
+@app.route('/eliminar_pdf', methods=['POST'])
+def eliminar_pdf():
+    archivo_id = request.form.get('archivo_id')
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # Obtener nombre del archivo antes de eliminar
+    cur.execute("SELECT nombre_archivo FROM archivos_pdf WHERE id = %s", (archivo_id,))
+    archivo = cur.fetchone()
+    if archivo:
+        nombre_archivo = archivo[0]
+        ruta_archivo = os.path.join('uploads', nombre_archivo)
+        if os.path.exists(ruta_archivo):
+            os.remove(ruta_archivo)  # Eliminar el archivo físico
+
+        # Eliminar de la base de datos
+        cur.execute("DELETE FROM archivos_pdf WHERE id = %s", (archivo_id,))
+        conn.commit()
+
+    cur.close()
+    conn.close()
+    return redirect(url_for('panel'))

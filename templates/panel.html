@@ -58,6 +58,11 @@
     .card h2 {
       color: #1a5276;
     }
+
+    .acciones-links a {
+      display: block;
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 <body>
@@ -81,10 +86,9 @@
 
   <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px;">
 
-    <!-- 🟦 COLUMNA IZQUIERDA -->
+    <!-- 🔳 COLUMNA IZQUIERDA -->
     <div style="flex: 1; min-width: 300px; max-width: 450px;">
-      
-      <!-- 📤 Subir PDF -->
+      <!-- 📄 Subir PDF -->
       <div class="card">
         <h2>📄 Subir PDF</h2>
         <form method="POST" enctype="multipart/form-data" action="/subir_pdf">
@@ -94,11 +98,11 @@
         </form>
       </div>
 
-      <!-- 🗂 Archivos Subidos -->
+      <!-- 📁 Archivos Subidos -->
       <div class="card" style="margin-top: 30px;">
         <h2>📁 Archivos subidos</h2>
         {% if lista_pdfs %}
-          <table style="width: 100%; border-collapse: collapse;">
+          <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
             <thead>
               <tr style="background-color: #d6eaf8;">
                 <th style="padding: 8px; border: 1px solid #ccc;">Archivo</th>
@@ -110,17 +114,16 @@
             <tbody>
               {% for pdf in lista_pdfs %}
                 <tr>
-                  <td style="padding: 8px; border: 1px solid #ccc;">{{ pdf[1] }}</td>
+                  <td style="padding: 8px; border: 1px solid #ccc; word-break: break-word; max-width: 180px;">{{ pdf[1] }}</td>
                   <td style="padding: 8px; border: 1px solid #ccc;">{{ pdf[2].strftime('%Y-%m-%d %H:%M') }}</td>
                   <td style="padding: 8px; border: 1px solid #ccc;">
-                    {% if pdf[3] %}
-                      ✅ Entrenado
-                    {% else %}
-                      ⏳ Sin entrenar
-                    {% endif %}
+                    {% if pdf[3] %}✅ Entrenado{% else %}⏳ Sin entrenar{% endif %}
                   </td>
                   <td style="padding: 8px; border: 1px solid #ccc;">
-                    <a href="{{ url_for('ver_pdf', nombre_archivo=pdf[1]) }}">👁 Ver</a>
+                    <div class="acciones-links">
+                      <a href="{{ url_for('ver_pdf', nombre_archivo=pdf[1]) }}">👁 Ver</a>
+                      <a href="{{ url_for('eliminar_pdf', nombre_archivo=pdf[1]) }}" onclick="return confirm('¿Estás seguro de eliminar este archivo?');" style="color: red;">🗑 Eliminar</a>
+                    </div>
                   </td>
                 </tr>
               {% endfor %}
@@ -146,5 +149,5 @@
 
   </div>
 </main>
-  </body>
+</body>
 </html>
