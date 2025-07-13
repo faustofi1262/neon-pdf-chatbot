@@ -102,28 +102,24 @@ def subir_pdf():
         flash("❌ El archivo debe ser un PDF válido.")
 
     return redirect(url_for("panel"))
-@app.route("/ver_pdf/<nombre_archivo>")
+@app.route('/ver_pdf/<nombre_archivo>')
 def ver_pdf(nombre_archivo):
-    if "usuario_id" not in session:
-        return redirect(url_for("login"))
+    # Validar que el archivo exista físicamente
+    ruta = os.path.join('static/uploads', nombre_archivo)
+    if not os.path.exists(ruta):
+        flash(f"El archivo {nombre_archivo} no se encuentra en el servidor.")
+        return redirect(url_for('panel'))
 
-    # Reutilizar el panel pero cargar ese PDF específico
+    # Cargar la lista de PDFs igual que en /panel
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("""
-        SELECT id, nombre_archivo, fecha_subida, entrenado
-        FROM archivos_pdf
-        WHERE usuario_id = %s
-        ORDER BY fecha_subida DESC
-    """, (session["usuario_id"],))
+    cur.execute("SELECT nombre_archivo, fecha_subida, entrenado FROM archivos_pdf ORDER BY fecha_subida DESC")
     lista_pdfs = cur.fetchall()
     cur.close()
     conn.close()
 
-    return render_template("panel.html",
-                           nombre=session["nombre_usuario"],
-                           ultimo_pdf=nombre_archivo,
-                           lista_pdfs=lista_pdfs)
+    # Mostrar el archivo seleccionado
+    return render_template('panel.html', lista_pdfs=lista_pdfs, ultimo_pdf=nombre_archivo)
 
 @app.route('/eliminar_pdf', methods=['GET'])
 def eliminar_pdf():
