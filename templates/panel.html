@@ -81,7 +81,29 @@
           <p>No se ha seleccionado ningún archivo todavía.</p>
         {% endif %}
       </section>
+      <!-- Fragmento para insertar al lado derecho bajo Subir PDF -->
+      <section id="usuarios" class="card">
+        <h2>👥 Gestión de Usuarios</h2>
+          <form method="POST" action="/crear_usuario">
+          <label for="nombre">Nombre:</label><br>
+          <input type="text" name="nombre" required><br><br>
 
+          <label for="correo">Correo:</label><br>
+          <input type="email" name="correo" required><br><br>
+
+          <label for="rol">Rol:</label><br>
+      <select name="rol" required>
+          <option value="admin">Administrador</option>
+          <option value="usuario">Usuario</option>
+          <option value="invitado">Invitado</option>
+      </select><br><br>
+
+          <label for="clave">Contraseña:</label><br>
+          <input type="password" name="clave" required><br><br>
+
+          <button type="submit">Crear Usuario</button>
+        </form>
+      </section>
     </main>
   </div>
 </body>
