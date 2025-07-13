@@ -136,7 +136,7 @@ def ver_pdf(nombre_archivo):
                            nombre=session["nombre_usuario"],
                            ultimo_pdf=nombre_archivo,
                            lista_pdfs=lista_pdfs)
-@app.route('/eliminar_pdf', methods=['POST'])
+@app.route('/eliminar_pdf', methods=['GET'])
 def eliminar_pdf():
     archivo_id = request.form.get('archivo_id')
     conn = get_connection()
