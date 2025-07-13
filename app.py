@@ -29,7 +29,7 @@ def login():
             session["rol"] = usuario[3]
             return redirect(url_for("panel"))
         else:
-            flash("Correo o contraseña incorrectos")
+            flash("Usuario o contraseña incorrectos")
             return redirect(url_for("login"))
 
     return render_template("login.html")
