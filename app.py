@@ -114,3 +114,25 @@ def subir_pdf():
         flash("❌ El archivo debe ser un PDF válido.")
 
     return redirect(url_for("panel"))
+@app.route("/ver_pdf/<nombre_archivo>")
+def ver_pdf(nombre_archivo):
+    if "usuario_id" not in session:
+        return redirect(url_for("login"))
+
+    # Reutilizar el panel pero cargar ese PDF específico
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, nombre_archivo, fecha_subida, entrenado
+        FROM archivos_pdf
+        WHERE usuario_id = %s
+        ORDER BY fecha_subida DESC
+    """, (session["usuario_id"],))
+    lista_pdfs = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return render_template("panel.html",
+                           nombre=session["nombre_usuario"],
+                           ultimo_pdf=nombre_archivo,
+                           lista_pdfs=lista_pdfs)

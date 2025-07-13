@@ -95,7 +95,12 @@
     <div class="card" style="flex: 2; min-width: 400px;">
       <h2>👁️ Visualizador de PDF</h2>
       {% if ultimo_pdf %}
-        <iframe src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" width="100%" height="500px" style="border: 1px solid #ccc;"></iframe>
+        <iframe 
+          src="{{ url_for('static', filename='uploads/' + ultimo_pdf) if ultimo_pdf else '' }}" 
+          width="100%" 
+          height="500px" 
+          style="border: 1px solid #ccc;">
+        </iframe>
       {% else %}
         <p>No se ha subido ningún archivo todavía.</p>
       {% endif %}
@@ -126,7 +131,7 @@
               {% endif %}
             </td>
             <td style="padding: 8px; border: 1px solid #ccc;">
-              <a href="{{ url_for('static', filename='uploads/' + pdf[1]) }}" target="_blank">👁 Ver</a>
+              <a href="{{ url_for('ver_pdf', nombre_archivo=pdf[1]) }}">👁 Ver</a>
               <!-- Aquí puedes agregar: <a href="/entrenar/{{ pdf[0] }}">⚙ Entrenar</a> -->
             </td>
           </tr>
