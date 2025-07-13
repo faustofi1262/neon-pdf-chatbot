@@ -5,6 +5,7 @@ import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import shutil
+from db import get_connection
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "clave-secreta-por-defecto")
 
@@ -136,25 +137,26 @@ def ver_pdf(nombre_archivo):
                            nombre=session["nombre_usuario"],
                            ultimo_pdf=nombre_archivo,
                            lista_pdfs=lista_pdfs)
+
 @app.route('/eliminar_pdf', methods=['GET'])
 def eliminar_pdf():
-    archivo_id = request.form.get('archivo_id')
+    nombre_archivo = request.args.get('nombre_archivo')
+    if not nombre_archivo:
+        return "Nombre de archivo no proporcionado", 400
+
+    ruta = os.path.join('static/uploads', nombre_archivo)
+
+    # Elimina el archivo del sistema si existe
+    if os.path.exists(ruta):
+        os.remove(ruta)
+
+    # Elimina el registro de la base de datos
     conn = get_connection()
     cur = conn.cursor()
-
-    # Obtener nombre del archivo antes de eliminar
-    cur.execute("SELECT nombre_archivo FROM archivos_pdf WHERE id = %s", (archivo_id,))
-    archivo = cur.fetchone()
-    if archivo:
-        nombre_archivo = archivo[0]
-        ruta_archivo = os.path.join('uploads', nombre_archivo)
-        if os.path.exists(ruta_archivo):
-            os.remove(ruta_archivo)  # Eliminar el archivo físico
-
-        # Eliminar de la base de datos
-        cur.execute("DELETE FROM archivos_pdf WHERE id = %s", (archivo_id,))
-        conn.commit()
-
+    cur.execute("DELETE FROM archivos_pdf WHERE nombre = %s", (nombre_archivo,))
+    conn.commit()
     cur.close()
     conn.close()
+
+    flash(f"Archivo '{nombre_archivo}' eliminado correctamente.")
     return redirect(url_for('panel'))
