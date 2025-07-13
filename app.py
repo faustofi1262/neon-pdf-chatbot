@@ -48,7 +48,7 @@ def login():
 def panel():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT nombre_archivo, fecha_subida, entrenado FROM archivos_pdf ORDER BY fecha_subida DESC")
+    cur.execute("SELECT nombre_archivo,  entrenado, fecha_subida FROM archivos_pdf ORDER BY fecha_subida DESC")
     lista_pdfs = cur.fetchall()
     cur.close()
     conn.close()
