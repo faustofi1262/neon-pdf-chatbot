@@ -99,33 +99,6 @@
           {% endif %}
         </div>
       </section>
-
-      <!-- Sección de usuarios -->
-      <section class="card">
-        <h2>👥 Gestión de Usuarios</h2>
-        <form action="{{ url_for('crear_usuario') }}" method="POST" class="form-usuarios">
-        <div class="form-row">
-          <label for="nombre_usuario">Nombre:</label>
-          <input type="text" name="nombre_usuario" required>
-
-          <label for="contrasena">Contraseña:</label>
-          <input type="password" name="contrasena" required>
-        </div>
-
-    <div class="form-row">
-      <label for="correo">Correo:</label>
-      <input type="email" name="correo" required>
-
-      <label for="rol">Rol:</label>
-      <select name="rol" required>
-        <option value="Administrador">Administrador</option>
-        <option value="Usuario">Usuario</option>
-      </select>
-    </div>
-    <button type="submit" style="margin-top: 20px;">Crear Usuario</button>
-  </form>
-</section>
-    </main>
-  </div>
+   
 </body>
 </html>
