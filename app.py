@@ -121,10 +121,10 @@ def ver_pdf(nombre_archivo):
 
     # Verifica que el archivo exista físicamente
     ruta_archivo = os.path.join('static/uploads', nombre_archivo)
-    if not os.path.exists(ruta_archivo):
+    if os.path.exists(ruta_archivo):
+        session['ultimo_pdf'] = nombre_archivo
+    else:
         flash("El archivo solicitado no existe.")
-        return redirect(url_for('panel'))
-
     return redirect(url_for('panel'))
 
 @app.route('/eliminar_pdf', methods=['GET'])
