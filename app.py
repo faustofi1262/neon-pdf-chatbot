@@ -167,6 +167,7 @@ def crear_usuario():
     try:
         nombre_usuario = request.form.get('nombre_usuario')
         contrasena = request.form.get('contrasena')
+        correo = request.form.get("correo")
         rol = request.form.get('rol')
 
         if not nombre_usuario or not contrasena or not rol:
@@ -178,9 +179,9 @@ def crear_usuario():
         cur = conn.cursor()
 
         cur.execute("""
-            INSERT INTO usuarios (nombre_usuario, contrasena_hash, rol)
+            INSERT INTO usuarios (nombre_usuario, contrasena_hash, correo, rol)
             VALUES (%s, %s, %s)
-        """, (nombre_usuario, hashed_password, rol))
+        """, (nombre_usuario, hashed_password, correo, rol))
 
         conn.commit()
         cur.close()
