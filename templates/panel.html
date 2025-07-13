@@ -169,20 +169,16 @@
     <!-- 🟥 COLUMNA DERECHA: visor -->
     <div class="card" style="flex: 2; min-width: 400px;">
       <h2>👁️ Visualizador de PDF</h2>
-      <iframe 
-        id="visor-pdf"
-        src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" 
-        width="100%" height="500px" style="border: 1px solid #ccc;">
-      </iframe>
+      {% if ultimo_pdf %}
+        <iframe 
+          src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" 
+          width="100%" height="500px" style="border: 1px solid #ccc;"></iframe>
+      {% else %}
+        <p>No se ha seleccionado ningún archivo todavía.</p>
+      {% endif %}
     </div>
 
   </div>
 </main>
-<script>
-  function cargarPDF(nombreArchivo) {
-    const visor = document.getElementById('visor-pdf');
-    visor.src = '/static/uploads/' + nombreArchivo;
-  }
-</script>
 </body>
 </html>
