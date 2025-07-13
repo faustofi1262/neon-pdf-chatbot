@@ -3,7 +3,6 @@ from db import get_connection
 import bcrypt
 import os
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash
 from datetime import datetime
 import shutil
 from db import get_connection
@@ -167,32 +166,25 @@ def usuarios():
 def crear_usuario():
     try:
         nombre = request.form.get('nombre_usuario')
+        correo = request.form.get('correo')
         contrasena = request.form.get('contrasena_hash')
-        correo = request.form.get("correo")
         rol = request.form.get('rol')
 
-        if not nombre or not contrasena or not rol:
-            return "Faltan datos en el formulario", 400
-
-        hashed_password = generate_password_hash(contrasena)
+        if not (nombre and correo and contrasena and rol):
+            return "Faltan datos en el formulario"
 
         conn = get_connection()
         cur = conn.cursor()
 
-        cur.execute("""
-            INSERT INTO usuarios (nombre_usuario, contrasena_hash, correo, rol)
-            VALUES (%s, %s, %s)
-        """, (nombre, hashed_password, correo, rol))
+        cur.execute("INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, rol) VALUES (%s, %s, %s, %s)",
+                    (nombre, correo, contrasena, rol))
 
         conn.commit()
         cur.close()
         conn.close()
 
-        flash("Usuario creado correctamente.")
-        return redirect(url_for('usuarios'))
-
+        return redirect('/usuarios')
     except Exception as e:
-        print("Error al crear usuario:", e)
-        return "Error interno al crear el usuario", 500
+        return f"⚠️ Error interno al crear el usuario: {e}"
 
 
