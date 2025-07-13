@@ -13,10 +13,8 @@
     <aside class="sidebar">
       <h2>UTMACH</h2>
       <ul>
-        <li><i class="fa fa-home"></i> <a href="#inicio">Inicio</a></li>
-        <li><i class="fa fa-upload"></i> <a href="#subir">Subir PDF</a></li>
-        <li><i class="fa fa-eye"></i> <a href="#visualizar">Visualizar</a></li>
-        <li><i class="fa fa-database"></i> <a href="#estado">Estado</a></li>
+        <li><i class="fa fa-home"></i> <a href="#subir">Subir PDF</a></li>
+        <li><i class="fa fa-users"></i> <a href="#usuarios">Usuarios</a></li>
       </ul>
     </aside>
 
@@ -46,9 +44,7 @@
           <br><br>
           <button type="submit">Subir PDF</button>
         </form>
-      </section>
-
-      <section id="estado" class="card">
+        <hr>
         <h2>📁 Archivos Subidos</h2>
         {% if lista_pdfs %}
           <table>
@@ -77,9 +73,7 @@
         {% else %}
           <p>No hay archivos subidos aún.</p>
         {% endif %}
-      </section>
-
-      <section id="visualizar" class="card">
+        <hr>
         <h2>👁️ Visualizador de PDF</h2>
         {% if ultimo_pdf %}
           <iframe src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" width="100%" height="500px" style="border: 1px solid #ccc;"></iframe>
@@ -87,6 +81,7 @@
           <p>No se ha seleccionado ningún archivo todavía.</p>
         {% endif %}
       </section>
+
     </main>
   </div>
 </body>
