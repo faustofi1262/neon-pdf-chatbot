@@ -13,12 +13,12 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        correo = request.form["correo"]
+        nombre_usuario = request.form["nombre_usuario"]
         contrasena = request.form["contrasena"].encode('utf-8')
 
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute("SELECT id, contrasena_hash, nombre_usuario, rol FROM usuarios WHERE correo = %s", (correo,))
+        cur.execute("SELECT id, contrasena_hash, nombre_usuario, rol FROM usuarios WHERE nombre_usuario = %s", (nombre_usuario,))
         usuario = cur.fetchone()
         cur.close()
         conn.close()
