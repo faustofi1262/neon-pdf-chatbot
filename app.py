@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash, session, flash
 from db import get_connection
 import bcrypt
 import os
@@ -106,22 +106,16 @@ def subir_pdf():
     return redirect(url_for("panel"))
 @app.route('/ver_pdf/<nombre_archivo>')
 def ver_pdf(nombre_archivo):
-    # Validar que el archivo exista físicamente
-    ruta = os.path.join('static/uploads', nombre_archivo)
-    if not os.path.exists(ruta):
-        flash(f"El archivo {nombre_archivo} no se encuentra en el servidor.")
+    # Guarda en sesión el PDF seleccionado para que el visor lo muestre
+    session['ultimo_pdf'] = nombre_archivo
+
+    # Verifica que el archivo exista físicamente
+    ruta_archivo = os.path.join('static/uploads', nombre_archivo)
+    if not os.path.exists(ruta_archivo):
+        flash("El archivo solicitado no existe.")
         return redirect(url_for('panel'))
 
-    # Cargar la lista de PDFs igual que en /panel
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT nombre_archivo, fecha_subida, entrenado FROM archivos_pdf ORDER BY fecha_subida DESC")
-    lista_pdfs = cur.fetchall()
-    cur.close()
-    conn.close()
-
-    # Mostrar el archivo seleccionado
-    return render_template('panel.html', lista_pdfs=lista_pdfs, ultimo_pdf=nombre_archivo)
+    return redirect(url_for('panel'))
 
 @app.route('/eliminar_pdf', methods=['GET'])
 def eliminar_pdf():
