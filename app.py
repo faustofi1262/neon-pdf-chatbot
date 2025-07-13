@@ -153,7 +153,7 @@ def eliminar_pdf():
     # Elimina el registro de la base de datos
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("DELETE FROM archivos_pdf WHERE nombre = %s", (nombre_archivo,))
+    cur.execute("DELETE FROM archivos_pdf WHERE nombre_archivo = %s", (nombre_archivo,))
     conn.commit()
     cur.close()
     conn.close()
