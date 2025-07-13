@@ -5,13 +5,23 @@
   <title>Login - Chatbot</title>
 </head>
 <body>
-  <h1>Bienvenido al sistema del Chatbot</h1>
-  <form action="/login" method="post">
-    <label>Usuario:</label>
-    <input type="text" name="usuario"><br>
-    <label>Contraseña:</label>
-    <input type="password" name="contrasena"><br>
-    <button type="submit">Ingresar</button>
+  <h2>Iniciar sesión</h2>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+        {% for message in messages %}
+          <li style="color: red;">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+  <form method="POST">
+    <label>Correo:</label><br>
+    <input type="email" name="correo" required><br>
+    <label>Contraseña:</label><br>
+    <input type="password" name="contrasena" required><br><br>
+    <button type="submit">Entrar</button>
   </form>
 </body>
 </html>
+
