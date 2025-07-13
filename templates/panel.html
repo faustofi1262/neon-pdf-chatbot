@@ -73,6 +73,14 @@
       <h2>Bienvenido, {{ nombre }} 👋</h2>
       <p>Desde este panel podrás administrar los archivos PDF, entrenar al chatbot y lanzar la interfaz.</p>
     </div>
+        <div class="card" style="margin-top: 30px;">
+      <h2>📄 Subir documento PDF</h2>
+      <form method="POST" enctype="multipart/form-data" action="/subir_pdf">
+        <input type="file" name="archivo_pdf" accept="application/pdf" required style="margin-bottom: 15px;">
+        <br>
+        <button type="submit">Subir PDF</button>
+      </form>
+    </div>
   </main>
 </body>
 </html>
