@@ -152,7 +152,7 @@
                   </td>
                   <td style="padding: 8px; border: 1px solid #ccc;">
                     <div class="acciones-links">
-                      <a href="{{ url_for('ver_pdf', nombre_archivo=pdf[1]) }}">👁 Ver</a>
+                      <a href="#" onclick="cargarPDF('{{ pdf[1] }}'); return false;" class="icono-accion ver">👁 Ver</a>
                       <a href="{{ url_for('eliminar_pdf', nombre_archivo=pdf[1]) }}" onclick="return confirm('¿Estás seguro de eliminar este archivo?');" style="color: red;">🗑 Eliminar</a>
                     </div>
                   </td>
@@ -170,15 +170,27 @@
     <div class="card" style="flex: 2; min-width: 400px;">
       <h2>👁️ Visualizador de PDF</h2>
       {% if ultimo_pdf %}
-        <iframe 
-          src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" 
-          width="100%" height="500px" style="border: 1px solid #ccc;"></iframe>
+      <iframe 
+        id="visor-pdf"
+        src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" 
+        width="100%" height="500px" style="border: 1px solid #ccc;">
+      </iframe>
       {% else %}
+      <iframe 
+        id="visor-pdf"
+        src="" 
+        width="100%" height="500px" style="border: 1px solid #ccc;">
+      </iframe>
         <p>No se ha seleccionado ningún archivo todavía.</p>
       {% endif %}
     </div>
-
   </div>
 </main>
+<script>
+  function cargarPDF(nombreArchivo) {
+    const visor = document.getElementById('visor-pdf');
+    visor.src = '/static/uploads/' + nombreArchivo;
+  }
+</script>
 </body>
 </html>
