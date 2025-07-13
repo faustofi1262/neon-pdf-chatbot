@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 import shutil
 from db import get_connection
+from werkzeug.security import generate_password_hash
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "clave-secreta-por-defecto")
 
@@ -164,27 +165,30 @@ def usuarios():
     return render_template('usuarios.html')
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
-    try:
-        nombre = request.form.get('nombre_usuario')
-        correo = request.form.get('correo')
-        contrasena = request.form.get('contrasena_hash')
-        rol = request.form.get('rol')
+    nombre_usuario = request.form.get('nombre_usuario')
+    correo = request.form.get('correo')
+    contrasena = request.form.get('contrasena_hash')
+    rol = request.form.get('rol')
 
-        if not all([nombre, correo, contrasena, rol]):
-            return "Faltan datos en el formulario"
+    if not nombre_usuario or not correo or not contrasena or not rol:
+        return "Faltan datos en el formulario"
+
+    try:
+        hash_contrasena = generate_password_hash(contrasena)
 
         conn = get_connection()
         cur = conn.cursor()
 
-        cur.execute("INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, rol) VALUES (%s, %s, %s, %s)",
-                    (nombre, correo, contrasena, rol))
+        cur.execute("""
+            INSERT INTO usuarios (nombre_usuario, correo, contrasena_hash, rol)
+            VALUES (%s, %s, %s, %s)
+        """, (nombre_usuario, correo, hash_contrasena, rol))
 
         conn.commit()
         cur.close()
         conn.close()
+        return redirect(url_for('usuarios'))
 
-        return redirect('/usuarios')
     except Exception as e:
-        return f"⚠️ Error interno al crear el usuario: {e}"
-
-
+        print("Error:", e)
+        return "Error interno al crear el usuario"
