@@ -63,7 +63,9 @@ def subir_pdf():
     if archivo and allowed_file(archivo.filename):
         filename = secure_filename(archivo.filename)
         ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
+        # 🛠 Crear la carpeta si no existe
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        
         # Guardar el archivo localmente
         archivo.save(ruta_guardado)
 
