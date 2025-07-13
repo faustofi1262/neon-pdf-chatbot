@@ -44,35 +44,22 @@ def login():
 
     return render_template("login.html")
 
-@app.route("/panel")
+@app.route('/panel')
 def panel():
-    if "usuario_id" not in session:
-        return redirect(url_for("login"))
-
-    # Obtener el último archivo PDF subido por el usuario
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("""
-        SELECT nombre_archivo FROM archivos_pdf
-        WHERE usuario_id = %s
-        ORDER BY fecha_subida DESC LIMIT 1
-    """, (session["usuario_id"],))
-    resultado = cur.fetchone()
-    ultimo_pdf = resultado[0] if resultado else None
-
-    # Todos los PDFs para el listado
-    cur.execute("""
-        SELECT id, nombre_archivo, fecha_subida, entrenado
-        FROM archivos_pdf
-        WHERE usuario_id = %s
-        ORDER BY fecha_subida DESC
-    """, (session["usuario_id"],))
+    cur.execute("SELECT nombre_archivo, fecha_subida, entrenado FROM archivos_pdf ORDER BY fecha_subida DESC")
     lista_pdfs = cur.fetchall()
-
     cur.close()
     conn.close()
 
-    return render_template("panel.html", nombre=session["nombre_usuario"], ultimo_pdf=ultimo_pdf, lista_pdfs=lista_pdfs)
+    # Validar si el último archivo aún existe
+    ultimo_pdf = lista_pdfs[0][0] if lista_pdfs else None
+    ruta = os.path.join('static/uploads', ultimo_pdf) if ultimo_pdf else None
+    if not ruta or not os.path.exists(ruta):
+        ultimo_pdf = None
+
+    return render_template('panel.html', lista_pdfs=lista_pdfs, ultimo_pdf=ultimo_pdf)
 
 @app.route("/logout")
 def logout():
