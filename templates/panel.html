@@ -1,168 +1,93 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de administración</title>
+  <meta charset="UTF-8" />
+  <title>Panel del Chatbot</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/static/style.css">
-  <style>
-    :root {
-      --color-principal: #1a5276;
-      --color-secundario: #d6eaf8;
-      --color-fondo: #f4f6f7;
-    }
-
-    body {
-      margin: 0;
-      background-color: var(--color-fondo);
-    }
-
-    .layout {
-      display: flex;
-    }
-
-    .sidebar {
-      width: 220px;
-      background-color: var(--color-principal);
-      color: white;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .sidebar h2 {
-      font-family: 'Segoe UI';
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-
-    .sidebar nav a {
-      display: block;
-      color: white;
-      text-decoration: none;
-      margin: 10px 0;
-      font-weight: bold;
-    }
-
-    .sidebar nav a:hover {
-      text-decoration: underline;
-    }
-
-    .main-content {
-      flex: 1;
-      padding: 20px 40px;
-    }
-
-    header {
-      background-color: var(--color-principal);
-      color: white;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logout-btn {
-      background-color: #f44336;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
-
-    .card {
-      background-color: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-    }
-  </style>
 </head>
 <body>
-  <header>
-    <h1>Panel del Chatbot</h1>
-    <form action="{{ url_for('logout') }}" method="GET">
-      <button class="logout-btn">Cerrar sesión</button>
-    </form>
-  </header>
-  <div class="layout">
+  <div class="container">
     <!-- Menú lateral -->
     <aside class="sidebar">
       <h2>UTMACH</h2>
-      <nav>
-        <a href="/panel"><i class="fa fa-home"></i> Inicio</a>
-        <a href="#"><i class="fa fa-upload"></i> Subir PDF</a>
-        <a href="#"><i class="fa fa-eye"></i> Visualizar</a>
-        <a href="#"><i class="fa fa-database"></i> Estado</a>
-      </nav>
+      <ul>
+        <li><i class="fa fa-home"></i> <a href="#inicio">Inicio</a></li>
+        <li><i class="fa fa-upload"></i> <a href="#subir">Subir PDF</a></li>
+        <li><i class="fa fa-eye"></i> <a href="#visualizar">Visualizar</a></li>
+        <li><i class="fa fa-database"></i> <a href="#estado">Estado</a></li>
+      </ul>
     </aside>
 
     <!-- Contenido principal -->
     <main class="main-content">
+      <header class="header">
+        <h1>Panel del Chatbot</h1>
+        <form method="GET" action="{{ url_for('logout') }}">
+          <button class="logout-btn">Cerrar sesión</button>
+        </form>
+      </header>
+
       {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <div style="color: green; font-weight: bold; margin-bottom: 20px;">
-            {% for message in messages %}<p>{{ message }}</p>{% endfor %}
-          </div>
-        {% endif %}
+      {% if messages %}
+        <div class="flash-message">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
       {% endwith %}
 
-      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-        <div style="flex: 1; min-width: 320px;">
-          <!-- Subir PDF -->
-          <div class="card">
-            <h2>📄 Subir PDF</h2>
-            <form method="POST" enctype="multipart/form-data" action="/subir_pdf">
-              <input type="file" name="archivo_pdf" accept="application/pdf" required><br><br>
-              <button type="submit">Subir PDF</button>
-            </form>
-          </div>
+      <section id="subir" class="card">
+        <h2>📄 Subir PDF</h2>
+        <form method="POST" enctype="multipart/form-data" action="/subir_pdf">
+          <input type="file" name="archivo_pdf" accept="application/pdf" required>
+          <br><br>
+          <button type="submit">Subir PDF</button>
+        </form>
+      </section>
 
-          <!-- Archivos Subidos -->
-          <div class="card">
-            <h2>📁 Archivos Subidos</h2>
-            {% if lista_pdfs %}
-              <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  <tr style="background-color: var(--color-secundario);">
-                    <th>Archivo</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for pdf in lista_pdfs %}
-                    <tr>
-                      <td class="{{ 'nombre-pdf-entrenado' if pdf[3] else 'nombre-pdf-sin-entrenar' }}">{{ pdf[1] }}</td>
-                      <td>{{ pdf[2].strftime('%Y-%m-%d %H:%M') }}</td>
-                      <td>{% if pdf[3] %}✅ Entrenado{% else %}⏳ Sin entrenar{% endif %}</td>
-                      <td>
-                        <a class="icono-accion ver" href="{{ url_for('ver_pdf', nombre_archivo=pdf[1]) }}">👁 Ver</a>
-                        <a class="icono-accion eliminar" href="{{ url_for('eliminar_pdf', nombre_archivo=pdf[1]) }}" onclick="return confirm('¿Estás seguro de eliminar este archivo?');">🗑 Eliminar</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p>No se han subido archivos todavía.</p>
-            {% endif %}
-          </div>
-        </div>
+      <section id="estado" class="card">
+        <h2>📁 Archivos Subidos</h2>
+        {% if lista_pdfs %}
+          <table>
+            <thead>
+              <tr>
+                <th>Archivo</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pdf in lista_pdfs %}
+              <tr>
+                <td class="{{ 'entrenado' if pdf[3] else 'no-entrenado' }}">{{ pdf[1] }}</td>
+                <td>{{ pdf[2].strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{% if pdf[3] %}✅ Entrenado{% else %}⏳ Sin entrenar{% endif %}</td>
+                <td>
+                  <a href="{{ url_for('ver_pdf', nombre_archivo=pdf[1]) }}">👁 Ver</a> |
+                  <a href="{{ url_for('eliminar_pdf', nombre_archivo=pdf[1]) }}" onclick="return confirm('¿Eliminar este archivo?');" style="color: red;">🗑</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>No hay archivos subidos aún.</p>
+        {% endif %}
+      </section>
 
-        <!-- Visualizador PDF -->
-        <div class="card" style="flex: 2; min-width: 400px;">
-          <h2>👁️ Visualizador de PDF</h2>
-          {% if ultimo_pdf %}
-            <iframe src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" width="100%" height="500px"></iframe>
-          {% else %}
-            <p>No se ha seleccionado ningún archivo todavía.</p>
-          {% endif %}
-        </div>
-      </div>
+      <section id="visualizar" class="card">
+        <h2>👁️ Visualizador de PDF</h2>
+        {% if ultimo_pdf %}
+          <iframe src="{{ url_for('static', filename='uploads/' + ultimo_pdf) }}" width="100%" height="500px" style="border: 1px solid #ccc;"></iframe>
+        {% else %}
+          <p>No se ha seleccionado ningún archivo todavía.</p>
+        {% endif %}
+      </section>
     </main>
   </div>
 </body>
-</html
+</html>
