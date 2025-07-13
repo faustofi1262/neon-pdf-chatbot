@@ -57,11 +57,21 @@ def panel():
         ORDER BY fecha_subida DESC LIMIT 1
     """, (session["usuario_id"],))
     resultado = cur.fetchone()
+    ultimo_pdf = resultado[0] if resultado else None
+
+    # Todos los PDFs para el listado
+    cur.execute("""
+        SELECT id, nombre_archivo, fecha_subida, entrenado
+        FROM archivos_pdf
+        WHERE usuario_id = %s
+        ORDER BY fecha_subida DESC
+    """, (session["usuario_id"],))
+    lista_pdfs = cur.fetchall()
+
     cur.close()
     conn.close()
 
-    ultimo_pdf = resultado[0] if resultado else None
-    return render_template("panel.html", nombre=session["nombre_usuario"], ultimo_pdf=ultimo_pdf)
+    return render_template("panel.html", nombre=session["nombre_usuario"], ultimo_pdf=ultimo_pdf, lista_pdfs=lista_pdfs)
 
 @app.route("/logout")
 def logout():

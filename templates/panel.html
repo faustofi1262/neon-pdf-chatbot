@@ -100,8 +100,44 @@
         <p>No se ha subido ningún archivo todavía.</p>
       {% endif %}
     </div>
+    <div class="card" style="margin-top: 30px; max-width: 90%; margin-left: auto; margin-right: auto;">
+  <h2>🗂 Archivos subidos</h2>
 
-  </div>
+  {% if lista_pdfs %}
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background-color: #d6eaf8;">
+          <th style="padding: 8px; border: 1px solid #ccc;">Archivo</th>
+          <th style="padding: 8px; border: 1px solid #ccc;">Fecha</th>
+          <th style="padding: 8px; border: 1px solid #ccc;">Estado</th>
+          <th style="padding: 8px; border: 1px solid #ccc;">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pdf in lista_pdfs %}
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">{{ pdf[1] }}</td>
+            <td style="padding: 8px; border: 1px solid #ccc;">{{ pdf[2].strftime('%Y-%m-%d %H:%M') }}</td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              {% if pdf[3] %}
+                ✅ Entrenado
+              {% else %}
+                ⏳ Sin entrenar
+              {% endif %}
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              <a href="{{ url_for('static', filename='uploads/' + pdf[1]) }}" target="_blank">👁 Ver</a>
+              <!-- Aquí puedes agregar: <a href="/entrenar/{{ pdf[0] }}">⚙ Entrenar</a> -->
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No se han subido archivos todavía.</p>
+  {% endif %}
+</div>
+</div>
 </main>
   </body>
 </html>
