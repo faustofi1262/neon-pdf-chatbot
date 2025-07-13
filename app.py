@@ -3,6 +3,7 @@ from db import get_connection
 import bcrypt
 import os
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash
 from datetime import datetime
 import shutil
 from db import get_connection
@@ -165,12 +166,12 @@ def usuarios():
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
     try:
-        nombre_usuario = request.form.get('nombre_usuario')
+        nombre = request.form.get('nombre_usuario')
         contrasena = request.form.get('contrasena')
         correo = request.form.get("correo")
         rol = request.form.get('rol')
 
-        if not nombre_usuario or not contrasena or not rol:
+        if not nombre or not contrasena or not rol:
             return "Faltan datos en el formulario", 400
 
         hashed_password = generate_password_hash(contrasena)
@@ -181,7 +182,7 @@ def crear_usuario():
         cur.execute("""
             INSERT INTO usuarios (nombre_usuario, contrasena_hash, correo, rol)
             VALUES (%s, %s, %s)
-        """, (nombre_usuario, hashed_password, correo, rol))
+        """, (nombre, hashed_password, correo, rol))
 
         conn.commit()
         cur.close()
