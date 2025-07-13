@@ -2,10 +2,19 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from db import get_connection
 import bcrypt
 import os
+from werkzeug.utils import secure_filename
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "clave-secreta-por-defecto")
 
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'pdf'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 @app.route("/")
 def index():
     return redirect(url_for("login"))
@@ -44,3 +53,33 @@ def panel():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+@app.route("/subir_pdf", methods=["POST"])
+def subir_pdf():
+    if "usuario_id" not in session:
+        return redirect(url_for("login"))
+
+    archivo = request.files.get("archivo_pdf")
+
+    if archivo and allowed_file(archivo.filename):
+        filename = secure_filename(archivo.filename)
+        ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+        # Guardar el archivo localmente
+        archivo.save(ruta_guardado)
+
+        # Registrar en la base de datos
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO archivos_pdf (nombre_archivo, ruta_archivo, usuario_id, fecha_subida, entrenado)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (filename, ruta_guardado, session["usuario_id"], datetime.now(), False))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        flash("✅ PDF subido y registrado correctamente.")
+    else:
+        flash("❌ El archivo debe ser un PDF válido.")
+
+    return redirect(url_for("panel"))
