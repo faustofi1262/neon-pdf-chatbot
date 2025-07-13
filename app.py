@@ -170,7 +170,7 @@ def crear_usuario():
         contrasena = request.form.get('contrasena_hash')
         rol = request.form.get('rol')
 
-        if not (nombre and correo and contrasena and rol):
+        if not all([nombre, correo, contrasena, rol]):
             return "Faltan datos en el formulario"
 
         conn = get_connection()
