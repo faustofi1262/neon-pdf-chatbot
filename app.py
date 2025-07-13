@@ -164,12 +164,12 @@ def usuarios():
     return render_template('usuarios.html')
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
-    nombre = request.form['nombre']
+    nombre_usuario = request.form.get['nombre_usuario']
     clave = request.form['clave']
     rol = request.form['rol']
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO usuarios (nombre, clave, rol) VALUES (%s, %s, %s)", (nombre, clave, rol))
+    cur.execute("INSERT INTO usuarios (nombre, clave, rol) VALUES (%s, %s, %s)", (nombre_usuario, clave, rol))
     conn.commit()
     cur.close()
     conn.close()
