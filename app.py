@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, session
 from db import get_connection
 import bcrypt
 import os
@@ -141,22 +141,32 @@ def ver_pdf(nombre_archivo):
 @app.route('/eliminar_pdf', methods=['GET'])
 def eliminar_pdf():
     nombre_archivo = request.args.get('nombre_archivo')
+
     if not nombre_archivo:
-        return "Nombre de archivo no proporcionado", 400
+        flash("Nombre de archivo no proporcionado.")
+        return redirect(url_for('panel'))
 
-    ruta = os.path.join('static/uploads', nombre_archivo)
+    ruta = os.path.join('static', 'uploads', nombre_archivo)
 
-    # Elimina el archivo del sistema si existe
-    if os.path.exists(ruta):
-        os.remove(ruta)
+    try:
+        # Eliminar archivo físico
+        if os.path.exists(ruta):
+            os.remove(ruta)
 
-    # Elimina el registro de la base de datos
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM archivos_pdf WHERE nombre_archivo = %s", (nombre_archivo,))
-    conn.commit()
-    cur.close()
-    conn.close()
+        # Eliminar de la base de datos
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM archivos_pdf WHERE nombre_archivo = %s", (nombre_archivo,))
+        conn.commit()
+        cur.close()
+        conn.close()
 
-    flash(f"Archivo '{nombre_archivo}' eliminado correctamente.")
+        # 🔄 Limpiar visor si es el archivo eliminado
+        if session.get('ultimo_pdf') == nombre_archivo:
+            session.pop('ultimo_pdf')
+
+        flash(f"✅ Archivo '{nombre_archivo}' eliminado correctamente.")
+    except Exception as e:
+        flash(f"⚠️ Error al eliminar el archivo: {e}")
+
     return redirect(url_for('panel'))
