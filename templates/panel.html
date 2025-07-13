@@ -2,11 +2,77 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel principal</title>
+  <title>Panel de administración</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #1a5276;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .logout-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: #c0392b;
+    }
+
+    main {
+      padding: 40px;
+      text-align: center;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .card h2 {
+      color: #1a5276;
+    }
+  </style>
 </head>
 <body>
-  <h2>Bienvenido, {{ nombre }} 👋</h2>
-  <p>Has iniciado sesión correctamente.</p>
-  <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+  <header>
+    <h1>Panel del Chatbot</h1>
+    <form action="{{ url_for('logout') }}" method="GET">
+      <button class="logout-btn">Cerrar sesión</button>
+    </form>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>Bienvenido, {{ nombre }} 👋</h2>
+      <p>Desde este panel podrás administrar los archivos PDF, entrenar al chatbot y lanzar la interfaz.</p>
+    </div>
+  </main>
 </body>
 </html>
