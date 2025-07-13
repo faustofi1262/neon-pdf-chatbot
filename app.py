@@ -48,16 +48,18 @@ def login():
 def panel():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT nombre_archivo, fecha_subida, entrenado FROM archivos_pdf ORDER BY fecha_subida DESC")
+    
+    # ✅ Asegúrate de que el orden sea: id, nombre_archivo, fecha_subida, entrenado
+    cur.execute("SELECT id, nombre_archivo, fecha_subida, entrenado FROM archivos_pdf ORDER BY fecha_subida DESC")
     lista_pdfs = cur.fetchall()
+    
+    # Esto evita error si no hay PDF seleccionado o si se eliminó
+    ultimo_pdf = session.get('ultimo_pdf')  
+    if ultimo_pdf and not os.path.exists(os.path.join('static/uploads', ultimo_pdf)):
+        ultimo_pdf = None
+
     cur.close()
     conn.close()
-
-    # Validar si el último archivo aún existe
-    ultimo_pdf = lista_pdfs[0][0] if lista_pdfs else None
-    ruta = os.path.join('static/uploads', ultimo_pdf) if ultimo_pdf else None
-    if not ruta or not os.path.exists(ruta):
-        ultimo_pdf = None
 
     return render_template('panel.html', lista_pdfs=lista_pdfs, ultimo_pdf=ultimo_pdf)
 
