@@ -4,7 +4,7 @@ import bcrypt
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
-
+import shutil
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "clave-secreta-por-defecto")
 
@@ -47,7 +47,21 @@ def login():
 def panel():
     if "usuario_id" not in session:
         return redirect(url_for("login"))
-    return render_template("panel.html", nombre=session["nombre_usuario"])
+
+    # Obtener el último archivo PDF subido por el usuario
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT nombre_archivo FROM archivos_pdf
+        WHERE usuario_id = %s
+        ORDER BY fecha_subida DESC LIMIT 1
+    """, (session["usuario_id"],))
+    resultado = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    ultimo_pdf = resultado[0] if resultado else None
+    return render_template("panel.html", nombre=session["nombre_usuario"], ultimo_pdf=ultimo_pdf)
 
 @app.route("/logout")
 def logout():
@@ -63,13 +77,18 @@ def subir_pdf():
     if archivo and allowed_file(archivo.filename):
         filename = secure_filename(archivo.filename)
         ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        # 🛠 Crear la carpeta si no existe
+
+        # Crear la carpeta si no existe
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        
-        # Guardar el archivo localmente
+        os.makedirs("static/uploads", exist_ok=True)
+
+        # Guardar el archivo
         archivo.save(ruta_guardado)
 
-        # Registrar en la base de datos
+        # Copiar también a static/uploads para visualizarlo
+        shutil.copy(ruta_guardado, os.path.join("static/uploads", filename))
+
+        # Guardar en base de datos
         conn = get_connection()
         cur = conn.cursor()
         cur.execute("""
