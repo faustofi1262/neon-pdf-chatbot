@@ -111,10 +111,17 @@
                 <th style="padding: 8px; border: 1px solid #ccc;">Acciones</th>
               </tr>
             </thead>
+            <!-- 📁 Selecciona el Color del Archivo si esta entrenado o no -->
             <tbody>
               {% for pdf in lista_pdfs %}
                 <tr>
-                  <td style="padding: 8px; border: 1px solid #ccc; word-break: break-word; max-width: 180px;">{{ pdf[1] }}</td>
+                  <td style="padding: 8px; border: 1px solid #ccc; word-break: break-word; max-width: 180px;">
+              {% if pdf[3] %}
+                  <span style="color: green; font-weight: bold;">{{ pdf[1] }}</span>
+              {% else %}
+                  <span style="color: red; font-weight: bold;">{{ pdf[1] }}</span>
+              {% endif %}
+            </td>
                   <td style="padding: 8px; border: 1px solid #ccc;">{{ pdf[2].strftime('%Y-%m-%d %H:%M') }}</td>
                   <td style="padding: 8px; border: 1px solid #ccc;">
                     {% if pdf[3] %}✅ Entrenado{% else %}⏳ Sin entrenar{% endif %}
