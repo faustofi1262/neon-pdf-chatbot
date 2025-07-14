@@ -199,3 +199,25 @@ def crear_usuario():
     except Exception as e:
         print("Error:", e)
         return "Error interno al crear el usuario"
+    @app.route('/editar_usuario', methods=['POST'])
+def editar_usuario():
+    id_usuario = request.form['id_usuario']
+    nombre_usuario = request.form['nombre_usuario']
+    correo = request.form['correo']
+    rol = request.form['rol']
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM usuarios WHERE id = %s", (id_usuario,))
+    usuario_editar = cur.fetchone()
+
+    cur.execute("SELECT * FROM usuarios ORDER BY id DESC")
+    lista_usuarios = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template('usuarios.html',
+                           usuario_editar=usuario_editar,
+                           lista_usuarios=lista_usuarios,
+                           modo_edicion=True)
