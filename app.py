@@ -160,9 +160,16 @@ def eliminar_pdf():
         flash(f"⚠️ Error al eliminar el archivo: {e}")
 
     return redirect(url_for('panel'))
-@app.route('/usuarios', methods=['GET'])
+@app.route('/usuarios')
 def usuarios():
-    return render_template('usuarios.html')
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, nombre_usuario, contrasena_hash, correo, rol FROM usuarios ORDER BY id DESC")
+    lista_usuarios = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('usuarios.html', lista_usuarios=lista_usuarios)
+
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
     nombre_usuario = request.form.get('nombre_usuario')
