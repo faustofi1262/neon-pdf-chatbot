@@ -199,7 +199,7 @@ def crear_usuario():
     except Exception as e:
         print("Error:", e)
         return "Error interno al crear el usuario"
-    @app.route('/editar_usuario', methods=['POST'])
+@app.route('/editar_usuario', methods=['POST'])
 def editar_usuario():
     id_usuario = request.form['id_usuario']
     nombre_usuario = request.form['nombre_usuario']
@@ -221,3 +221,4 @@ def editar_usuario():
                            usuario_editar=usuario_editar,
                            lista_usuarios=lista_usuarios,
                            modo_edicion=True)
+
