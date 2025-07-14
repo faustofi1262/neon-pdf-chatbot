@@ -232,4 +232,43 @@ def eliminar_usuario(id):
 
     flash("Usuario eliminado correctamente.")
     return redirect(url_for('usuarios'))
+# Mostrar usuarios (con edición si se pasa id)
+@app.route('/usuarios')
+def usuarios():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM usuarios ORDER BY id ASC")
+    lista_usuarios = cur.fetchall()
+
+    id_editar = request.args.get('editar')
+    usuario_editar = None
+
+    if id_editar:
+        cur.execute("SELECT * FROM usuarios WHERE id = %s", (id_editar,))
+        usuario_editar = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return render_template('usuarios.html', lista_usuarios=lista_usuarios, usuario_editar=usuario_editar)
+
+
+# Actualizar usuario
+@app.route('/actualizar_usuario', methods=['POST'])
+def actualizar_usuario():
+    id_usuario = request.form['id']
+    nombre = request.form['nombre_usuario']
+    correo = request.form['correo']
+    rol = request.form['rol']
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE usuarios SET nombre_usuario=%s, correo=%s, rol=%s WHERE id=%s",
+                (nombre, correo, rol, id_usuario))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    flash('Usuario actualizado correctamente.')
+    return redirect(url_for('usuarios'))
 

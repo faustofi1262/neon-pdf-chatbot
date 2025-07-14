@@ -40,32 +40,38 @@
 
       <section class="card">
         <h2>👥 {{ modo_edicion and "Editar Usuario" or "Crear Usuario" }}</h2>
-        <form action="{{ modo_edicion and url_for('actualizar_usuario') or url_for('crear_usuario') }}" method="POST" class="form-usuarios">
-          {% if modo_edicion %}
-            <input type="hidden" name="id_usuario" value="{{ usuario_editar[0] }}">
-          {% endif %}
+        <form action="{{ url_for('actualizar_usuario') if usuario_editar else url_for('crear_usuario') }}" method="POST" class="form-usuarios">
+  {% if usuario_editar %}
+    <input type="hidden" name="id" value="{{ usuario_editar[0] }}">
+  {% endif %}
+  <div class="form-row">
+    <label>Nombre:</label>
+    <input type="text" name="nombre_usuario" value="{{ usuario_editar[1] if usuario_editar else '' }}" required>
 
-          <div class="form-row">
-            <label for="nombre_usuario">Nombre:</label>
-            <input type="text" name="nombre_usuario" required value="{{ usuario_editar[1] if modo_edicion else '' }}">
+    <label>Contraseña:</label>
+    {% if not usuario_editar %}
+      <input type="password" name="contrasena_hash" required>
+    {% else %}
+      <input type="password" name="contrasena_hash" placeholder="(Sin cambiar)">
+    {% endif %}
+  </div>
 
-            <label for="contrasena">Contraseña:</label>
-            <input type="password" name="contrasena_hash" {{ 'required' if not modo_edicion else '' }}>
-          </div>
+  <div class="form-row">
+    <label>Correo:</label>
+    <input type="email" name="correo" value="{{ usuario_editar[3] if usuario_editar else '' }}" required>
 
-          <div class="form-row">
-            <label for="correo">Correo:</label>
-            <input type="email" name="correo" required value="{{ usuario_editar[3] if modo_edicion else '' }}">
+    <label>Rol:</label>
+    <select name="rol" required>
+      <option value="Administrador" {% if usuario_editar and usuario_editar[4] == 'Administrador' %}selected{% endif %}>Administrador</option>
+      <option value="Usuario" {% if usuario_editar and usuario_editar[4] == 'Usuario' %}selected{% endif %}>Usuario</option>
+    </select>
+  </div>
 
-            <label for="rol">Rol:</label>
-            <select name="rol" required>
-              <option value="Administrador" {% if modo_edicion and usuario_editar[4] == 'Administrador' %}selected{% endif %}>Administrador</option>
-              <option value="Usuario" {% if modo_edicion and usuario_editar[4] == 'Usuario' %}selected{% endif %}>Usuario</option>
-            </select>
-          </div>
+  <button type="submit" style="margin-top: 20px;">
+    {% if usuario_editar %}Actualizar Usuario{% else %}Crear Usuario{% endif %}
+  </button>
+</form>
 
-          <button type="submit" style="margin-top: 20px;">{{ modo_edicion and "Actualizar" or "Crear Usuario" }}</button>
-        </form>
       </section>
 
       <section class="card" style="margin-top: 30px;">
