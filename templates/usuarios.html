@@ -38,32 +38,37 @@
         {% endif %}
       {% endwith %}
 
+      <!-- Formulario Crear / Editar -->
       <section class="card">
-        <h2>👥 {{ modo_edicion and "Editar Usuario" or "Crear Usuario" }}</h2>
-        <form action="{{ url_for('actualizar_usuario') if usuario_editar else url_for('crear_usuario') }}" method="POST" class="form-usuarios">
+        <h2>👥 {{ 'Editar Usuario' if modo_edicion else 'Crear Usuario' }}</h2>
+        <form action="{{ url_for('actualizar_usuario') if modo_edicion else url_for('crear_usuario') }}" method="POST" class="form-usuarios">
           {% if modo_edicion %}
             <input type="hidden" name="id_usuario" value="{{ usuario_editar[0] }}">
           {% endif %}
-         <div class="form-row">
+
+          <div class="form-row">
             <label for="nombre_usuario">Nombre:</label>
-           <input type="text" name="nombre_usuario" value="{{ usuario_editar[1] if modo_edicion else '' }}" required>
+            <input type="text" name="nombre_usuario" value="{{ usuario_editar[1] if modo_edicion else '' }}" required>
 
             <label for="correo">Correo:</label>
             <input type="email" name="correo" value="{{ usuario_editar[3] if modo_edicion else '' }}" required>
           </div>
 
-  <div class="form-row">
-    <label>Rol:</label>
-    <select name="rol" required>
-      <option value="Administrador" {% if usuario_editar and usuario_editar[4] == 'Administrador' %}selected{% endif %}>Administrador</option>
-      <option value="Usuario" {% if usuario_editar and usuario_editar[4] == 'Usuario' %}selected{% endif %}>Usuario</option>
-    </select>
-  </div>
+          <div class="form-row">
+            <label>Rol:</label>
+            <select name="rol" required>
+              <option value="Administrador" {% if modo_edicion and usuario_editar[4] == 'Administrador' %}selected{% endif %}>Administrador</option>
+              <option value="Usuario" {% if modo_edicion and usuario_editar[4] == 'Usuario' %}selected{% endif %}>Usuario</option>
+            </select>
+          </div>
 
-  <button type="submit">{{ 'Actualizar Usuario' if modo_edicion else 'Crear Usuario' }}</button>
-</form>
+          <button type="submit" style="margin-top: 20px;">
+            {{ 'Actualizar Usuario' if modo_edicion else 'Crear Usuario' }}
+          </button>
+        </form>
       </section>
 
+      <!-- Tabla de Usuarios -->
       <section class="card" style="margin-top: 30px;">
         <h2>📋 Lista de Usuarios</h2>
         {% if lista_usuarios %}
