@@ -41,20 +41,24 @@
       <section class="card">
         <h2>👥 {{ modo_edicion and "Editar Usuario" or "Crear Usuario" }}</h2>
         <form action="{{ url_for('actualizar_usuario') if usuario_editar else url_for('crear_usuario') }}" method="POST" class="form-usuarios">
-  {% if usuario_editar %}
-    <input type="hidden" name="id" value="{{ usuario_editar[0] }}">
-  {% endif %}
-  <div class="form-row">
-    <label>Nombre:</label>
-    <input type="text" name="nombre_usuario" value="{{ usuario_editar[1] if usuario_editar else '' }}" required>
+          {% if modo_edicion %}
+            <input type="hidden" name="id_usuario" value="{{ usuario_editar[0] }}">
+          {% endif %}
 
-    <label>Contraseña:</label>
-    {% if not usuario_editar %}
-      <input type="password" name="contrasena_hash" required>
-    {% else %}
-      <input type="password" name="contrasena_hash" placeholder="(Sin cambiar)">
-    {% endif %}
-  </div>
+          {% if usuario_editar %}
+            <input type="hidden" name="id" value="{{ usuario_editar[0] }}">
+          {% endif %}
+            <div class="form-row">
+            <label>Nombre:</label>
+            <input type="text" name="nombre_usuario" value="{{ usuario_editar[1] if usuario_editar else '' }}" required>
+
+            <label>Contraseña:</label>
+          {% if not usuario_editar %}
+            <input type="password" name="contrasena_hash" required>
+          {% else %}
+            <input type="password" name="contrasena_hash" placeholder="(Sin cambiar)">
+          {% endif %}
+        </div>
 
   <div class="form-row">
     <label>Correo:</label>
