@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Crear Usuario</title>
+  <title>Gestor de Usuarios</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -38,62 +38,73 @@
         {% endif %}
       {% endwith %}
 
-        <section class="card">
-      <section class="card" style="margin-top: 30px;">
-  <h2>📋 Lista de Usuarios</h2>
-  {% if lista_usuarios %}
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Correo</th>
-          <th>Rol</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for usuario in lista_usuarios %}
-        <tr>
-          <td>{{ usuario[1] }}</td>
-          <td>{{ usuario[3] }}</td>
-          <td>{{ usuario[4] }}</td>
-          <td>
-            <a href="{{ url_for('editar_usuario', id=usuario[0]) }}">✏️ Editar</a> |
-            <a href="{{ url_for('eliminar_usuario', id=usuario[0]) }}" onclick="return confirm('¿Seguro que deseas eliminar este usuario?');" style="color: red;">🗑 Eliminar</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No hay usuarios registrados.</p>
-  {% endif %}
-</section>
- 
-  <h2>👥 Gestión de Usuarios</h2>
-  <form action="{{ url_for('crear_usuario') }}" method="POST" class="form-usuarios">
-    <div class="form-row">
-      <label for="nombre_usuario">Nombre:</label>
-      <input type="text" name="nombre_usuario" required>
+      <section class="card">
+        <h2>👥 {{ modo_edicion and "Editar Usuario" or "Crear Usuario" }}</h2>
+        <form action="{{ modo_edicion and url_for('actualizar_usuario') or url_for('crear_usuario') }}" method="POST" class="form-usuarios">
+          {% if modo_edicion %}
+            <input type="hidden" name="id_usuario" value="{{ usuario_editar[0] }}">
+          {% endif %}
 
-      <label for="contrasena">Contraseña:</label>
-      <input type="password" name="contrasena_hash" required>
-    </div>
+          <div class="form-row">
+            <label for="nombre_usuario">Nombre:</label>
+            <input type="text" name="nombre_usuario" required value="{{ usuario_editar[1] if modo_edicion else '' }}">
 
-    <div class="form-row">
-        <label for="correo">Correo:</label>
-        <input type="email" name="correo" required>
+            <label for="contrasena">Contraseña:</label>
+            <input type="password" name="contrasena_hash" {{ 'required' if not modo_edicion else '' }}>
+          </div>
 
-        <label for="rol">Rol:</label>
-        <select name="rol" required>
-          <option value="Administrador">Administrador</option>
-          <option value="Usuario">Usuario</option>
-        </select>
-    </div>
+          <div class="form-row">
+            <label for="correo">Correo:</label>
+            <input type="email" name="correo" required value="{{ usuario_editar[3] if modo_edicion else '' }}">
 
-          <button type="submit" style="margin-top: 20px;">Crear Usuario</button>
+            <label for="rol">Rol:</label>
+            <select name="rol" required>
+              <option value="Administrador" {% if modo_edicion and usuario_editar[4] == 'Administrador' %}selected{% endif %}>Administrador</option>
+              <option value="Usuario" {% if modo_edicion and usuario_editar[4] == 'Usuario' %}selected{% endif %}>Usuario</option>
+            </select>
+          </div>
+
+          <button type="submit" style="margin-top: 20px;">{{ modo_edicion and "Actualizar" or "Crear Usuario" }}</button>
         </form>
-    </section>
+      </section>
+
+      <section class="card" style="margin-top: 30px;">
+        <h2>📋 Lista de Usuarios</h2>
+        {% if lista_usuarios %}
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for usuario in lista_usuarios %}
+              <tr>
+                <td>{{ usuario[1] }}</td>
+                <td>{{ usuario[3] }}</td>
+                <td>{{ usuario[4] }}</td>
+                <td>
+                  <form method="POST" action="{{ url_for('editar_usuario') }}" style="display:inline;">
+                    <input type="hidden" name="id_usuario" value="{{ usuario[0] }}">
+                    <input type="hidden" name="nombre_usuario" value="{{ usuario[1] }}">
+                    <input type="hidden" name="correo" value="{{ usuario[3] }}">
+                    <input type="hidden" name="rol" value="{{ usuario[4] }}">
+                    <button type="submit" style="color: blue; background: none; border: none; cursor: pointer;">✏️</button>
+                  </form>
+                  |
+                  <a href="{{ url_for('eliminar_usuario', id=usuario[0]) }}" onclick="return confirm('¿Seguro que deseas eliminar este usuario?');" style="color: red;">🗑</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>No hay usuarios registrados.</p>
+        {% endif %}
+      </section>
     </main>
   </div>
 </body>
