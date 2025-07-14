@@ -271,40 +271,25 @@ def actualizar_usuario():
 
     flash('Usuario actualizado correctamente.')
     return redirect(url_for('usuarios'))
+
 @app.route('/actualizar_usuario', methods=['POST'])
 def actualizar_usuario():
-    id_usuario = request.form.get("id_usuario")
-    nombre_usuario = request.form.get("nombre_usuario")
-    correo = request.form.get("correo")
-    rol = request.form.get("rol")
-    contrasena = request.form.get("contrasena_hash")
-
-    if not id_usuario:
-        flash("ID de usuario no proporcionado.")
-        return redirect(url_for('usuarios'))
+    id_usuario = request.form['id_usuario']
+    nombre_usuario = request.form['nombre_usuario']
+    correo = request.form['correo']
+    rol = request.form['rol']
 
     conn = get_connection()
     cur = conn.cursor()
-
-    # Actualizar con o sin nueva contraseña
-    if contrasena:
-        contrasena_hash = generate_password_hash(contrasena)
-        cur.execute("""
-            UPDATE usuarios
-            SET nombre_usuario = %s, correo = %s, rol = %s, contrasena_hash = %s
-            WHERE id = %s
-        """, (nombre_usuario, correo, rol, contrasena_hash, id_usuario))
-    else:
-        cur.execute("""
-            UPDATE usuarios
-            SET nombre_usuario = %s, correo = %s, rol = %s
-            WHERE id = %s
-        """, (nombre_usuario, correo, rol, id_usuario))
-
+    cur.execute("""
+        UPDATE usuarios
+        SET nombre_usuario = %s, correo = %s, rol = %s
+        WHERE id = %s
+    """, (nombre_usuario, correo, rol, id_usuario))
     conn.commit()
     cur.close()
     conn.close()
 
-    flash("Usuario actualizado correctamente.")
+    flash('Usuario actualizado correctamente.')
     return redirect(url_for('usuarios'))
 
