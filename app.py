@@ -221,4 +221,15 @@ def editar_usuario():
                            usuario_editar=usuario_editar,
                            lista_usuarios=lista_usuarios,
                            modo_edicion=True)
+@app.route('/eliminar_usuario/<int:id>')
+def eliminar_usuario(id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM usuarios WHERE id = %s", (id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    flash("Usuario eliminado correctamente.")
+    return redirect(url_for('usuarios'))
 
