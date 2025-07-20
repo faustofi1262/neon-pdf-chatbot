@@ -160,6 +160,15 @@ def eliminar_pdf():
         flash(f"⚠️ Error al eliminar el archivo: {e}")
 
     return redirect(url_for('panel'))
+@app.route('/usuarios')
+def usuarios():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, nombre_usuario, contrasena_hash, correo, rol FROM usuarios ORDER BY id DESC")
+    lista_usuarios = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('usuarios.html', lista_usuarios=lista_usuarios)
 
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
@@ -224,26 +233,6 @@ def eliminar_usuario(id):
     flash("Usuario eliminado correctamente.")
     return redirect(url_for('usuarios'))
 # Mostrar usuarios (con edición si se pasa id)
-@app.route('/usuarios')
-def usuarios():
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM usuarios ORDER BY id ASC")
-    lista_usuarios = cur.fetchall()
-
-    id_editar = request.args.get('editar')
-    usuario_editar = None
-
-    if id_editar:
-        cur.execute("SELECT * FROM usuarios WHERE id = %s", (id_editar,))
-        usuario_editar = cur.fetchone()
-
-    cur.close()
-    conn.close()
-
-    return render_template('usuarios.html', lista_usuarios=lista_usuarios, usuario_editar=usuario_editar)
-
-
 # Actualizar usuario
 @app.route('/actualizar_usuario', methods=['POST'])
 def actualizar_usuario():
