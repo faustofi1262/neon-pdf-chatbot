@@ -9,20 +9,17 @@ from db import get_connection
 from werkzeug.security import generate_password_hash
 from flask import Flask, request, jsonify, render_template
 import openai
-import pinecone
+from pinecone import Pinecone
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "clave-secreta-por-defecto")
 
 # Inicializar claves
 openai.api_key = os.getenv("OPENAI_API_KEY") or "TU_CLAVE_OPENAI"
-pinecone.init(
-    api_key=os.getenv("PINECONE_API_KEY") or "TU_CLAVE_PINECONE",
-    environment=os.getenv("PINECONE_ENV") or "TU_ENTORNO_PINECONE"
-)
-index = pinecone.Index("pdf-files")  # Este debe ser tu índice real
+pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY") or "TU_CLAVE")
 
-
+index = pc.Index("pdf-files")
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
