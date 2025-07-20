@@ -2,7 +2,7 @@ Flask
 gunicorn
 psycopg2-binary
 openai
-pinecone-client
+pinecone
 bcrypt
 python-dotenv
 pdfplumber
