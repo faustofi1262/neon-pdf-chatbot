@@ -252,24 +252,5 @@ def actualizar_usuario():
     flash('Usuario actualizado correctamente.')
     return redirect(url_for('usuarios'))
 
-@app.route('/actualizar_usuario', methods=['POST'])
-def actualizar_usuario():
-    id_usuario = request.form['id_usuario']
-    nombre_usuario = request.form['nombre_usuario']
-    correo = request.form['correo']
-    rol = request.form['rol']
 
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        UPDATE usuarios
-        SET nombre_usuario = %s, correo = %s, rol = %s
-        WHERE id = %s
-    """, (nombre_usuario, correo, rol, id_usuario))
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    flash('Usuario actualizado correctamente.')
-    return redirect(url_for('usuarios'))
 
