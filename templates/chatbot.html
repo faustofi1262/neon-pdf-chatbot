@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot UTMACH</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            margin: 10px 0;
+            text-decoration: none;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            background-color: #f4f6f9;
+        }
+
+        .chatbox {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        .user {
+            text-align: right;
+            font-weight: bold;
+            color: #003366;
+        }
+
+        .bot {
+            text-align: left;
+            font-style: italic;
+        }
+
+        .input-area {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Panel SICOP</h2>
+        <a href="/usuarios">Usuarios</a>
+        <a href="/subir_pdf">Subir PDFs</a>
+        <a href="/chatbot">Chatbot</a>
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+    <div class="content">
+        <h1>Asistente Virtual UTMACH</h1>
+        <div class="chatbox" id="chatbox">
+            <!-- Mensajes aparecerán aquí -->
+        </div>
+        <div class="input-area">
+            <input type="text" id="inputPregunta" placeholder="Escribe tu pregunta...">
+            <button onclick="enviarPregunta()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        function agregarMensaje(texto, clase) {
+            const mensaje = document.createElement('div');
+            mensaje.className = `message ${clase}`;
+            mensaje.textContent = texto;
+            document.getElementById('chatbox').appendChild(mensaje);
+            document.getElementById('chatbox').scrollTop = document.getElementById('chatbox').scrollHeight;
+        }
+
+        async function enviarPregunta() {
+            const pregunta = document.getElementById('inputPregunta').value;
+            if (!pregunta.trim()) return;
+
+            agregarMensaje("Tú: " + pregunta, "user");
+            document.getElementById('inputPregunta').value = "";
+
+            const response = await fetch("/chatbot_api", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pregunta })
+            });
+
+            const data = await response.json();
+            agregarMensaje("Bot: " + data.respuesta, "bot");
+        }
+    </script>
+</body>
+</html>

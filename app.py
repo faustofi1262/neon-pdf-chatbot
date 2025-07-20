@@ -7,8 +7,22 @@ from datetime import datetime
 import shutil
 from db import get_connection
 from werkzeug.security import generate_password_hash
+from flask import Flask, request, jsonify, render_template
+import openai
+import pinecone
+
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "clave-secreta-por-defecto")
+
+# Inicializar claves
+openai.api_key = os.getenv("OPENAI_API_KEY") or "TU_CLAVE_OPENAI"
+pinecone.init(
+    api_key=os.getenv("PINECONE_API_KEY") or "TU_CLAVE_PINECONE",
+    environment=os.getenv("PINECONE_ENV") or "TU_ENTORNO_PINECONE"
+)
+index = pinecone.Index("pdf-files")  # Este debe ser tu índice real
+
+
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -251,6 +265,74 @@ def actualizar_usuario():
 
     flash('Usuario actualizado correctamente.')
     return redirect(url_for('usuarios'))
+def responder_con_chatbot(pregunta):
+    # Generar el embedding de la pregunta
+    try:
+        embedding_pregunta = openai.Embedding.create(
+            input=pregunta,
+            model="text-embedding-ada-002"
+        )["data"][0]["embedding"]
+    except Exception as e:
+        return f"Error generando embedding: {str(e)}"
+
+    # Buscar contexto en Pinecone
+    try:
+        resultados = index.query(
+            vector=embedding_pregunta,
+            top_k=5,
+            include_metadata=True,
+            namespace="pdf_files"
+        )
+    except Exception as e:
+        return f"Error consultando Pinecone: {str(e)}"
+
+    # Construir contexto
+    contexto = ""
+    for match in resultados.get("matches", []):
+        if match["score"] > 0.75 and "texto" in match["metadata"]:
+            contexto += match["metadata"]["texto"] + "\n"
+
+    # Si hay contexto suficiente, usarlo
+    if contexto.strip():
+        prompt = f"""
+        Responde la siguiente pregunta basada SOLO en el siguiente contenido extraído de documentos oficiales de la UTMACH.
+
+        CONTEXTO:
+        {contexto}
+
+        PREGUNTA:
+        {pregunta}
+
+        RESPUESTA:
+        """
+    else:
+        # Si no hay contexto, permitir consulta libre a OpenAI
+        prompt = f"""
+        No encontré información precisa en los documentos cargados.
+        Por favor responde la siguiente pregunta con la mejor información general disponible para orientar a un estudiante nuevo en la UTMACH.
+
+        PREGUNTA:
+        {pregunta}
+
+        RESPUESTA:
+        """
+    # Generar respuesta
+    try:
+        respuesta = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
+        )["choices"][0]["message"]["content"]
+    except Exception as e:
+        return f"Error generando respuesta con OpenAI: {str(e)}"
+
+    return respuesta.strip()
+
+@app.route("/chatbot_api", methods=["POST"])
+def chatbot_api():
+    pregunta = request.json.get("pregunta", "")
+    respuesta = responder_con_chatbot(pregunta)  # Esta función buscará en Pinecone y luego en OpenAI
+    return jsonify({"respuesta": respuesta})
 
 
 
