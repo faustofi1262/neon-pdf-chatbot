@@ -283,7 +283,7 @@ def responder_con_chatbot(pregunta):
 
     # Buscar contexto en Pinecone
     try:
-        resultados = index.query(
+        resultados = pinecone_index.query(
             vector=embedding_pregunta,
             top_k=5,
             include_metadata=True,
@@ -350,7 +350,7 @@ def responder_con_chatbot(pregunta):
         return f"Bot: Error generando embedding: {str(e)}"
 
     try:
-        resultados = index.query(
+        resultados = pinecone_index.query(
             vector=embedding_pregunta,
             top_k=5,
             include_metadata=True,
