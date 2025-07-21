@@ -28,7 +28,7 @@ from openai import OpenAI
 
 # Inicializar Pinecone y OpenAI
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-index = pc.Index("neon-chatbot")
+pinecone_index = pc.Index("neon-chatbot")
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
