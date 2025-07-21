@@ -26,9 +26,63 @@
       <h2>UTMACH</h2>
       <ul>
         <li><i class="fa fa-upload"></i> <a href="#" onclick="mostrarSeccion('subirPDF')">Subir PDF</a></li>
-        <li><i class="fa fa-users"></i> <a href="{{ url_for('usuarios') }}">Usuarios</a>
+        <li><i class="fa fa-users"></i> <a href="{{ url_for('usuarios') }}">Usuarios</a></li>
+        <li><i class="fa fa-robot"></i> <a href="#" onclick="mostrarSeccion('chatbot')">Chatbot</a></li>
       </ul>
     </aside>
+    <!-- Sección Chatbot -->
+<section id="chatbot" class="seccion-panel" style="display: none;">
+  <div class="card">
+    <h2>🤖 Asistente Virtual UTMACH</h2>
+    <div id="chatbox" style="background:#fff; border-radius:8px; padding:15px; height:300px; overflow-y:auto; border:1px solid #ccc;"></div>
+    <div style="margin-top:10px; display:flex; gap:10px;">
+      <input type="text" id="inputPregunta" placeholder="Escribe tu pregunta..." style="flex:1; padding:10px;">
+      <button onclick="enviarPregunta()" style="padding:10px;">Enviar</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .user {
+    text-align: right;
+    font-weight: bold;
+    color: #003366;
+    margin: 5px 0;
+  }
+  .bot {
+    text-align: left;
+    font-style: italic;
+    color: #444;
+    margin: 5px 0;
+  }
+</style>
+
+<script>
+  function agregarMensaje(texto, clase) {
+    const mensaje = document.createElement('div');
+    mensaje.className = clase;
+    mensaje.textContent = texto;
+    document.getElementById('chatbox').appendChild(mensaje);
+    document.getElementById('chatbox').scrollTop = document.getElementById('chatbox').scrollHeight;
+  }
+
+  async function enviarPregunta() {
+    const pregunta = document.getElementById('inputPregunta').value;
+    if (!pregunta.trim()) return;
+
+    agregarMensaje("Tú: " + pregunta, "user");
+    document.getElementById('inputPregunta').value = "";
+
+    const response = await fetch("/chatbot_api", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pregunta })
+    });
+
+    const data = await response.json();
+    agregarMensaje("Bot: " + data.respuesta, "bot");
+  }
+</script>
 
     <!-- Contenido principal -->
     <main class="main-content">
