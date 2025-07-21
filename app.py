@@ -324,6 +324,9 @@ def responder_con_chatbot(pregunta):
         return f"Error generando respuesta con OpenAI: {str(e)}"
 
     return respuesta.strip()
+@app.route("/chatbot")
+def vista_chatbot():
+    return render_template("chatbot.html")
 
 @app.route("/chatbot_api", methods=["POST"])
 def chatbot_api():
