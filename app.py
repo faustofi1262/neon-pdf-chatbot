@@ -1,22 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from db import get_connection
 import bcrypt
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import shutil
-from db import get_connection
 from werkzeug.security import generate_password_hash
-from flask import Flask, request, jsonify, render_template
-import openai
 from pinecone import Pinecone
+from openai import OpenAI
 
 
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 # Inicializar claves
-openai.api_key = os.getenv("OPENAI_API_KEY")
+OpenAI.api_key = os.getenv("OPENAI_API_KEY")
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
 index = pc.Index("neon-chatbot")
@@ -24,6 +23,14 @@ index = pc.Index("neon-chatbot")
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+from pinecone import Pinecone
+from openai import OpenAI
+
+# Inicializar Pinecone y OpenAI
+pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+index = pc.Index("neon-chatbot")
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -262,8 +269,6 @@ def actualizar_usuario():
 
     flash('Usuario actualizado correctamente.')
     return redirect(url_for('usuarios'))
-from openai import OpenAI
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def responder_con_chatbot(pregunta):
     try:
@@ -334,4 +339,58 @@ def chatbot_api():
 def vista_chatbot():
     return render_template("chatbot.html")
 
+def responder_con_chatbot(pregunta):
+    try:
+        response = client.embeddings.create(
+            input=pregunta,
+            model="text-embedding-ada-002"
+        )
+        embedding_pregunta = response.data[0].embedding
+    except Exception as e:
+        return f"Bot: Error generando embedding: {str(e)}"
+
+    try:
+        resultados = index.query(
+            vector=embedding_pregunta,
+            top_k=5,
+            include_metadata=True,
+            namespace="pdf_files"
+        )
+    except Exception as e:
+        return f"Bot: Error buscando en Pinecone: {str(e)}"
+
+    contexto = ""
+    for match in resultados.get("matches", []):
+        if match["score"] > 0.75 and "texto" in match["metadata"]:
+            contexto += match["metadata"]["texto"] + "\n"
+
+    if contexto.strip():
+        prompt = f"""
+        Responde SOLO en base a la siguiente información institucional:
+
+        {contexto}
+
+        Pregunta del usuario:
+        {pregunta}
+
+        Respuesta:
+        """
+    else:
+        prompt = f"""
+        No encontré información precisa en los documentos institucionales cargados.
+        Por favor, responde esta pregunta de la mejor forma posible para orientar al estudiante:
+
+        {pregunta}
+        """
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
+        )
+        respuesta = response.choices[0].message.content.strip()
+        return respuesta
+    except Exception as e:
+        return f"Bot: Error generando respuesta con OpenAI: {str(e)}"
 
