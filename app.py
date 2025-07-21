@@ -262,15 +262,19 @@ def actualizar_usuario():
 
     flash('Usuario actualizado correctamente.')
     return redirect(url_for('usuarios'))
+from openai import OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 def responder_con_chatbot(pregunta):
-    # Generar el embedding de la pregunta
     try:
-        embedding_pregunta = openai.Embedding.create(
+        # Generar embedding de la pregunta
+        response = client.embeddings.create(
             input=pregunta,
             model="text-embedding-ada-002"
-        )["data"][0]["embedding"]
+        )
+        embedding_pregunta = response.data[0].embedding
     except Exception as e:
-        return f"Error generando embedding: {str(e)}"
+        return f"Bot: Error generando embedding: {str(e)}"
 
     # Buscar contexto en Pinecone
     try:
@@ -281,49 +285,45 @@ def responder_con_chatbot(pregunta):
             namespace="pdf_files"
         )
     except Exception as e:
-        return f"Error consultando Pinecone: {str(e)}"
+        return f"Bot: Error buscando en Pinecone: {str(e)}"
 
-    # Construir contexto
+    # Armar el contexto desde los vectores
     contexto = ""
     for match in resultados.get("matches", []):
         if match["score"] > 0.75 and "texto" in match["metadata"]:
             contexto += match["metadata"]["texto"] + "\n"
 
-    # Si hay contexto suficiente, usarlo
+    # Construir prompt con o sin contexto
     if contexto.strip():
         prompt = f"""
-        Responde la siguiente pregunta basada SOLO en el siguiente contenido extraído de documentos oficiales de la UTMACH.
+        Responde SOLO en base a la siguiente información institucional:
 
-        CONTEXTO:
         {contexto}
 
-        PREGUNTA:
+        Pregunta del usuario:
         {pregunta}
 
-        RESPUESTA:
+        Respuesta:
         """
     else:
-        # Si no hay contexto, permitir consulta libre a OpenAI
         prompt = f"""
-        No encontré información precisa en los documentos cargados.
-        Por favor responde la siguiente pregunta con la mejor información general disponible para orientar a un estudiante nuevo en la UTMACH.
+        No encontré información precisa en los documentos institucionales cargados.
+        Por favor, responde esta pregunta de la mejor forma posible para orientar al estudiante:
 
-        PREGUNTA:
         {pregunta}
-
-        RESPUESTA:
         """
-    # Generar respuesta
+
+    # Generar respuesta con OpenAI
     try:
-        respuesta = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
-        )["choices"][0]["message"]["content"]
+        )
+        respuesta = response.choices[0].message.content.strip()
+        return respuesta
     except Exception as e:
-        return f"Error generando respuesta con OpenAI: {str(e)}"
-
-    return respuesta.strip()
+        return f"Bot: Error generando respuesta con OpenAI: {str(e)}"
 
 @app.route("/chatbot_api", methods=["POST"])
 def chatbot_api():
