@@ -13,13 +13,13 @@ from pinecone import Pinecone
 
 
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "clave-secreta-por-defecto")
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 # Inicializar claves
-openai.api_key = os.getenv("OPENAI_API_KEY") or "TU_CLAVE_OPENAI"
-pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY") or "TU_CLAVE")
+openai.api_key = os.getenv("OPENAI_API_KEY")
+pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
-index = pc.Index("pdf-files")
+index = pc.Index("neon-chatbot")
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
