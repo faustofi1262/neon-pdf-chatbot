@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Chatbot UTMACH Flotante</title>
+  <style>
+    #chatbot-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 999;
+    }
+
+    #chatbot-window {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 300px;
+      height: 400px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      z-index: 999;
+    }
+
+    #chat-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      font-family: sans-serif;
+      font-size: 14px;
+    }
+
+    #chat-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    #chat-input input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+    }
+
+    #chat-input button {
+      padding: 8px;
+      background-color: #003366;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Botón flotante -->
+<button id="chatbot-button">💬</button>
+
+<!-- Ventana flotante del chatbot -->
+<div id="chatbot-window">
+  <div id="chat-messages"></div>
+  <div id="chat-input">
+    <input type="text" id="user-input" placeholder="Escribe tu pregunta..." />
+    <button onclick="enviarPregunta()">▶</button>
+  </div>
+</div>
+
+<script>
+  const boton = document.getElementById("chatbot-button");
+  const ventana = document.getElementById("chatbot-window");
+  const mensajes = document.getElementById("chat-messages");
+
+  boton.onclick = () => {
+    ventana.style.display = (ventana.style.display === "flex") ? "none" : "flex";
+  };
+
+  async function enviarPregunta() {
+    const input = document.getElementById("user-input");
+    const pregunta = input.value.trim();
+    if (!pregunta) return;
+
+    mensajes.innerHTML += `<div><strong>Tú:</strong> ${pregunta}</div>`;
+    input.value = "";
+
+    const respuestaDiv = document.createElement("div");
+    respuestaDiv.innerHTML = "<em>Bot: escribiendo...</em>";
+    mensajes.appendChild(respuestaDiv);
+    mensajes.scrollTop = mensajes.scrollHeight;
+
+    try {
+      const response = await fetch("https://neon-pdf-chatbot.onrender.com/chatbot_api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pregunta })
+      });
+
+      const data = await response.json();
+      respuestaDiv.innerHTML = `<strong>Bot:</strong> ${data.respuesta}`;
+      mensajes.scrollTop = mensajes.scrollHeight;
+    } catch (e) {
+      respuestaDiv.innerHTML = "<strong>Bot:</strong> Error de conexión";
+    }
+  }
+</script>
+
+</body>
+</html>
