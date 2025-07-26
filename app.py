@@ -335,9 +335,9 @@ def chatbot_api():
     pregunta = request.json.get("pregunta", "")
     respuesta = responder_con_chatbot(pregunta)  # Esta función buscará en Pinecone y luego en OpenAI
     return jsonify({"respuesta": respuesta})
-@app.route("/chatbot")
-def vista_chatbot():
-    return render_template("chatbot.html")
+#@app.route("/chatbot")
+#def vista_chatbot():
+    #return render_template("chatbot.html")
 
 def responder_con_chatbot(pregunta):
     try:
