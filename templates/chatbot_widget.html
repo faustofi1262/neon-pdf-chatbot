@@ -4,67 +4,72 @@
   <meta charset="UTF-8">
   <title>Chatbot UTMACH Flotante</title>
   <style>
-    #chatbot-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #003366;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 999;
-    }
+  /* Botón flotante con imagen */
+  #chatbot-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    z-index: 999;
+  }
 
-    #chatbot-window {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 300px;
-      height: 400px;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      display: none;
-      flex-direction: column;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      z-index: 999;
-    }
+  #chatbot-button img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
 
-    #chat-messages {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-      font-family: sans-serif;
-      font-size: 14px;
-    }
+  #chatbot-window {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 300px;
+    height: 400px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    z-index: 999;
+  }
 
-    #chat-input {
-      display: flex;
-      border-top: 1px solid #ccc;
-    }
+  #chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    font-family: sans-serif;
+    font-size: 14px;
+  }
 
-    #chat-input input {
-      flex: 1;
-      padding: 8px;
-      border: none;
-    }
+  #chat-input {
+    display: flex;
+    border-top: 1px solid #ccc;
+  }
 
-    #chat-input button {
-      padding: 8px;
-      background-color: #003366;
-      color: white;
-      border: none;
-    }
-  </style>
+  #chat-input input {
+    flex: 1;
+    padding: 8px;
+    border: none;
+  }
+
+  #chat-input button {
+    padding: 8px;
+    background-color: #003366;
+    color: white;
+    border: none;
+  }
+</style>
 </head>
 <body>
 
 <!-- Botón flotante -->
-<button id="chatbot-button">💬</button>
+<div id="chatbot-button">
+  <img src="{{ url_for('static', filename='paky.png') }}" alt="Chatbot Paky" />
+</div>
 
 <!-- Ventana flotante del chatbot -->
 <div id="chatbot-window">
