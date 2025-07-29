@@ -13,7 +13,6 @@ from flask_cors import CORS
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
-app = Flask(__name__)
 CORS(app)  # Habilita CORS para aceptar peticiones desde otras páginas web
 
 
