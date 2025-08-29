@@ -15,9 +15,14 @@
     }
 
     window.onload = function () {
-      mostrarSeccion('subirPDF'); // Mostrar esta por defecto al cargar
+      var urlActual = "{{ 'true' if url_actual else 'false' }}";
+      if (urlActual === "true") {
+        mostrarSeccion('configurarURL');
+      } else {
+        mostrarSeccion('subirPDF');
+      }
     }
-  </script>
+   </script>
 </head>
 <body>
   <div class="container">

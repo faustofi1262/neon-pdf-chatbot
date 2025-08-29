@@ -396,3 +396,42 @@ def responder_con_chatbot(pregunta):
     except Exception as e:
         return f"Bot: Error generando respuesta con OpenAI: {str(e)}"
 
+@app.route("/configurar_url_chat", methods=["GET", "POST"])
+def configurar_url_chat():
+    mensaje = ""
+    url_actual = ""
+
+    # Si envía el formulario
+    if request.method == "POST":
+        nueva_url = request.form.get("url_chat")
+
+        conn = conectar_db()
+        cur = conn.cursor()
+
+        # Verifica si ya hay una URL guardada
+        cur.execute("SELECT id FROM configuracion LIMIT 1")
+        existe = cur.fetchone()
+
+        if existe:
+            cur.execute("UPDATE configuracion SET url_chat = %s WHERE id = %s", (nueva_url, existe[0]))
+        else:
+            cur.execute("INSERT INTO configuracion (url_chat) VALUES (%s)", (nueva_url,))
+
+        conn.commit()
+        conn.close()
+        mensaje = "✅ URL actualizada correctamente"
+        url_actual = nueva_url
+
+    else:
+        # Mostrar la URL guardada actual
+        conn = conectar_db()
+        cur = conn.cursor()
+        cur.execute("SELECT url_chat FROM configuracion LIMIT 1")
+        row = cur.fetchone()
+        url_actual = row[0] if row else ""
+        conn.close()
+
+    return render_template("panel.html", url_actual=url_actual, mensaje=mensaje)
+
+def conectar_db():
+    return get_connection()
