@@ -95,7 +95,7 @@
                   <form method="POST" action="{{ url_for('editar_usuario') }}" style="display:inline;">
                     <input type="hidden" name="id_usuario" value="{{ usuario[0] }}">
                     <input type="hidden" name="nombre_usuario" value="{{ usuario[1] }}">
-                    <input type="hidden" name="correo" value="{{ usuario[3] }}">
+                    <input type="hidden" name="correo" value="{{ usuario[2] }}">
                     <input type="hidden" name="rol" value="{{ usuario[4] }}">
                     <button type="submit" style="color: blue; background: none; border: none; cursor: pointer;">✏️</button>
                   </form>
