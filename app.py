@@ -194,9 +194,9 @@ def usuarios():
 def crear_usuario():
     nombre_usuario = request.form.get('nombre_usuario')
     correo = request.form.get('correo')
-    contrasena = request.form.get('contrasena_hash')
     rol = request.form.get('rol')
-
+    contrasena = request.form.get('contrasena_hash')
+    
     if not nombre_usuario or not correo or not contrasena or not rol:
         return "Faltan datos en el formulario"
 
@@ -260,11 +260,19 @@ def actualizar_usuario():
     nombre = request.form['nombre_usuario']
     correo = request.form['correo']
     rol = request.form['rol']
-
+    contrasena = request.form.get('contrasena')
+    
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("UPDATE usuarios SET nombre_usuario=%s, correo=%s, rol=%s WHERE id=%s",
-                (nombre, correo, rol, id_usuario))
+
+    if contrasena:
+        hashed_password = bcrypt.hashpw(contrasena.encode("utf-8"), bcrypt.gensalt())
+        cur.execute("UPDATE usuarios SET nombre_usuario = %s, correo = %s, contrasena_hash = %s, rol = %s WHERE id = %s",
+                    (nombre, correo, hashed_password, rol, id_usuario))
+    else:
+        cur.execute("UPDATE usuarios SET nombre_usuario = %s, correo = %s, rol = %s WHERE id = %s",
+                    (nombre, correo, rol, id_usuario))
+    
     conn.commit()
     cur.close()
     conn.close()

@@ -52,6 +52,10 @@
 
             <label for="correo">Correo:</label>
             <input type="email" name="correo" value="{{ usuario_editar[3] if modo_edicion else '' }}" required>
+           
+            <label for="contrasena">Contraseña:</label>
+            <input type="password" name="contrasena" id="contrasena" 
+                  {% if modo_edicion %} placeholder="Dejar en blanco para ºº  no cambiar" {% else %} required {% endif %}>
           </div>
 
           <div class="form-row">
