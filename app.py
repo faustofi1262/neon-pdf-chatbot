@@ -184,7 +184,7 @@ def eliminar_pdf():
 def usuarios():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, nombre_usuario, contrasena_hash, correo, rol FROM usuarios ORDER BY id DESC")
+    cur.execute("SELECT id, nombre_usuario, correo, contrasena_hash, rol FROM usuarios ORDER BY id DESC")
     lista_usuarios = cur.fetchall()
     cur.close()
     conn.close()
