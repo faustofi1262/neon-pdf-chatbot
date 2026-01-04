@@ -225,22 +225,33 @@ def editar_usuario():
     nombre_usuario = request.form['nombre_usuario']
     correo = request.form['correo']
     rol = request.form['rol']
+    nueva_contrasena = request.form['contrasena']
 
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM usuarios WHERE id = %s", (id_usuario,))
-    usuario_editar = cur.fetchone()
 
-    cur.execute("SELECT * FROM usuarios ORDER BY id DESC")
-    lista_usuarios = cur.fetchall()
+    # Verifica si hay una nueva contraseña
+    if nueva_contrasena:
+        hash_contrasena = generate_password_hash(nueva_contrasena)
+        cur.execute("""
+            UPDATE usuarios 
+            SET nombre_usuario = %s, correo = %s, contrasena_hash = %s, rol = %s
+            WHERE id = %s
+        """, (nombre_usuario, correo, hash_contrasena, rol, id_usuario))
+    else:
+        # No cambiar contraseña si está vacía
+        cur.execute("""
+            UPDATE usuarios 
+            SET nombre_usuario = %s, correo = %s, rol = %s
+            WHERE id = %s
+        """, (nombre_usuario, correo, rol, id_usuario))
 
+    conn.commit()
     cur.close()
     conn.close()
 
-    return render_template('usuarios.html',
-                           usuario_editar=usuario_editar,
-                           lista_usuarios=lista_usuarios,
-                           modo_edicion=True)
+    return redirect(url_for('usuarios'))
+
 @app.route('/eliminar_usuario/<int:id>')
 def eliminar_usuario(id):
     conn = get_connection()
